@@ -16,6 +16,7 @@ import { getInitials } from "../utils/avatar";
 import { networkAPI } from "../utils/api";
 import { Button } from "./ui/button";
 import { FacultySlideOver } from "./FacultySlideOver";
+import { FacultyLink } from "./FacultyLink";
 
 interface SearchResultsProps {
   results: SearchResult[];
@@ -268,15 +269,18 @@ export function SearchResults({
                   )}
                 </button>
                 <div className="flex-1">
-                  <button
-                    type="button"
-                    onClick={() => setSlideOverFaculty({ faculty: result.data as FacultyMember, matchedKeywords: result.matchedKeywords })}
-                    className="text-left hover:text-[#8b0000] transition-colors"
+                  {/* Name goes to the real profile; the photo above still opens
+                      the quick-preview slide-over. FacultyLink renders plain
+                      text when the record has no numeric profileId. */}
+                  <FacultyLink
+                    facultyId={(result.data as FacultyMember).profileId}
+                    onNavigate={onNavigate}
+                    className="hover:text-[#8b0000] transition-colors"
                   >
                     <h3 className="text-xl font-medium text-gray-900 mb-1 hover:text-[#8b0000]">
                       {result.data.name}
                     </h3>
-                  </button>
+                  </FacultyLink>
                   <p className="text-sm text-gray-600 mb-3">
                     {result.data.title} · {result.data.department}
                   </p>
@@ -368,6 +372,17 @@ export function SearchResults({
 
                   {/* Action buttons */}
                   <div className="flex items-center gap-3 flex-wrap mt-1">
+                    {onNavigate && (result.data as FacultyMember).profileId !== undefined && (
+                      <FacultyLink
+                        facultyId={(result.data as FacultyMember).profileId}
+                        onNavigate={onNavigate}
+                      >
+                        <Button size="sm" variant="outline">
+                          <User className="w-4 h-4" />
+                          View profile
+                        </Button>
+                      </FacultyLink>
+                    )}
                     {result.data.email && (
                       <a
                         href={`mailto:${result.data.email}?subject=Inquiry via SCOUP Platform&body=Hello ${result.data.name.split(" ").pop()},%0D%0A%0D%0AI found your profile on the SCOUP platform and would like to connect regarding your research${result.data.researchInterests[0] ? ` in ${result.data.researchInterests[0]}` : ""}.%0D%0A%0D%0A`}

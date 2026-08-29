@@ -6,6 +6,7 @@ import {
 import type { FacultyMember } from "../data/searchData";
 import { getInitials } from "../utils/avatar";
 import { Button } from "./ui/button";
+import { FacultyLink } from "./FacultyLink";
 
 interface FacultySlideOverProps {
   faculty: FacultyMember;
@@ -74,6 +75,20 @@ export function FacultySlideOver({
               <p className="text-sm text-gray-600 truncate">{faculty.title}</p>
             )}
             <p className="text-sm text-[#8b0000] font-medium truncate">{faculty.department}</p>
+            {/* The slide-over is a preview; this is the way out to the full,
+                permanent profile page. Hidden when there is no numeric id. */}
+            {onNavigate && faculty.profileId !== undefined && (
+              <FacultyLink
+                facultyId={faculty.profileId}
+                onNavigate={(path) => {
+                  onClose();
+                  onNavigate(path);
+                }}
+                className="text-xs text-gray-500 hover:text-[#8b0000] hover:underline transition-colors"
+              >
+                View full profile →
+              </FacultyLink>
+            )}
           </div>
 
           <button

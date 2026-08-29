@@ -403,6 +403,94 @@ held during the change.
 - **Status:** In repo, built successfully, **not deployed** - `/var/www` was left untouched by
   instruction.
 
+### 2026-08-29 18:50 - Home-page faculty results now link to real profiles
+
+- **Files changed:** `src/data/searchData.ts`, `src/utils/datasetNormalization.ts`,
+  `src/utils/searchEngine.ts`, `src/components/SearchResults.tsx`,
+  `src/components/FacultySlideOver.tsx`
+
+Closes planned work #10. The backend now returns a numeric `profileId` alongside the
+`SU-DIR-...` slug on every faculty item in `/api/public/search-data/` (backend commit
+`ac37ffc`), which is the id `/faculty/:id` and `/api/faculty/<id>/public/` take.
+
+`FacultyMember` gained `profileId?: number`; `normalizeFacultyRecord` accepts it only when it
+is a positive integer, so a malformed payload degrades to plain text rather than a dead link -
+the same guarantee `FacultyLink` already makes. No new link component was written; the existing
+`FacultyLink` from the 18:35 entry is reused in both places.
+
+| Where | What links |
+| --- | --- |
+| `SearchResults` faculty card | the name, plus an explicit **View profile** action button |
+| `FacultySlideOver` header | **View full profile ->**, which closes the panel and navigates |
+
+The photo on a result card still opens the slide-over quick preview, so the two affordances are
+split rather than stacked on the same element - a name that both previewed and navigated would
+be ambiguous.
+
+**The blocker was not only the missing pk.** Wiring the links exposed that
+`fetchUnifiedSearch` hardcodes `type: "paper"` on every row, and the endpoint it calls
+(`/api/search/` -> `semantic_paper_search`) ranks **papers only**. So the "Faculty Member"
+result card - filter chip, inquiry button, slide-over and all - was **unreachable from the home
+page**, and linking it would have produced nothing but dead weight. Confirmed against the live
+API before changing anything:
+
+```
+$ curl -s "https://scoup-salisbury.net/api/search/?q=machine+learning" | jq '.results[0] | keys'
+# paper fields only - no faculty in the response at any query
+```
+
+Rather than add a second backend ranker, `searchEngine.ts` now matches faculty against the
+dataset **already downloaded into the browser** by `Home.tsx` (`setSearchDataset` was keeping
+only the words for autocomplete and discarding the records). Two rules are borrowed from the
+backend ranker so the two agree: every query term must match, and matches are on **word
+boundaries, not substrings**, so "art" does not match "particle". Fields are scored name 92 >
+research interests 82 > keywords 72 > themes 68 > title 60 > department 55, with a bonus when
+the matched value is the query exactly. Faculty and paper results are merged and sorted by
+confidence; if the paper request fails, faculty results still render instead of an empty page.
+
+`matchedKeywords` reports only the interests that actually matched, so the card's gold
+highlighting marks real evidence rather than every tag on the record. Term regexes are compiled
+once per search, not once per record - the index is ~1,600 people wide.
+
+- **Verification - the production bundle against a real backend, not mocked.** `dist/` served on
+  :4173 with SPA fallback, proxying `/api` to a Django dev server on :9123 running against a
+  throwaway copy of the database. Same-origin, so it reproduces production exactly. Playwright
+  over the system Chromium at `/usr/bin/chromium-browser`.
+
+| Check | Result |
+| --- | --- |
+| `/api/public/search-data/` carries `profileId` | 182/182 faculty; `SU-DIR-acocella-c` -> `1668` |
+| home search "Acocella" | 1 Faculty Member card, 2 links, both `/faculty/1668` |
+| clicking the name | `/faculty/1668`, h1 **"Cecilia Acocella"** - byte-matching `/api/faculty/1668/public/` |
+| home search "sociology" | 9 faculty cards, 18 profile links (9 names + 9 View profile) |
+| home search "computer sciences" | 9 faculty cards, 18 profile links |
+| home search "Nursing" | 38 results; 18 faculty cards and 36 links once paged past the higher-confidence papers |
+| slide-over -> **View full profile** | closes the panel and lands on the matching profile |
+| home search "machine learning" | 0 faculty - correct: **no** faculty record contains both terms anywhere (verified directly against the payload, not inferred from the empty UI) |
+| console errors across every search | none |
+
+`npx tsc --noEmit` reports **no new errors** - the ones it prints (`AdminDashboard` tab types,
+`BrowseCategories` line 875, `replaceAll` lib target, versioned `ui/*` import specifiers,
+`publicData.ts` implicit anys) are all pre-existing and in files untouched here. Build succeeds
+(2,327 modules, `index-CoEyds-2.js` 1.16 MB), built with `env -u VITE_API_BASE_URL` and
+re-checked for `onrender` (**0** occurrences) per the backend log's `INCIDENT-20260829-1749`.
+
+**Stylesheet discipline.** Every class was checked against `src/index.css` first. `underline`
+was written and **caught as inert - the base class does not exist in the stylesheet at all**
+(only `underline-offset-4` and `hover:underline` do). Replaced with `hover:underline` plus a
+`->` glyph so the link still reads as one. All other classes used
+(`text-xs`, `text-gray-500`, `transition-colors`, `hover:text-[#8b0000]`, `text-xl`,
+`font-medium`, `w-4`, `h-4`) were confirmed present.
+
+- **Status:** In repo, built successfully, **not deployed** - `/var/www` left untouched by
+  instruction. Requires the backend commit `ac37ffc` (already live) for `profileId`.
+- **Push:** commit `34b4558` is **local-only**. This repo's remote is SSH
+  (`git@github.com:sweetrellish/scoup-frontend-2.0.git`) and `~/.ssh/id_ed25519` is
+  passphrase-protected with nothing loaded in the agent (`ssh-add -l` -> "The agent has no
+  identities"), so `git push` blocks on the passphrase prompt. Same cause as the 18:32 entry.
+  To push: `ssh-add ~/.ssh/id_ed25519 && cd ~/scoup-frontend-2.0 && git push`. The backend
+  repo uses HTTPS and pushed cleanly.
+
 ---
 
 ## Planned work
@@ -418,5 +506,6 @@ held during the change.
 | 7 | **`src/index.css` is precompiled and nothing regenerates it** - unknown Tailwind classes are silently inert. Add `tailwindcss` as a build dependency | Not started - see 2026-08-29 16:40 |
 | 8 | `ExpertsPage.tsx` **and `CapabilitiesPage.tsx`** use inert classes (`pl-9`, `pr-3`, `max-w-xl`, `text-[11px]`, `focus:ring-[#8b0000]/30`) | Not started - see 2026-08-29 18:35 |
 | 9 | React "unique key prop" warning in `AdminOverviewPage` | Not started |
-| 10 | Home-page search results cannot link to `/faculty/<id>`: `/api/public/search-data/` returns `faculty_id` slugs, not the pk. Needs the pk added to that payload (backend + deploy) | Not started - see 2026-08-29 18:35 |
-| 11 | `/docs` calls `GET /api/contact/settings/`, which does not exist - a 404 on every load | Not started - found 2026-08-29 18:35 |
+| 10 | Home-page search results cannot link to `/faculty/<id>`: `/api/public/search-data/` returns `faculty_id` slugs, not the pk. Needs the pk added to that payload (backend + deploy) | **Done** (2026-08-29 18:50) - `profileId` wired through; faculty results also made reachable, see that entry |
+| 11 | `/docs` calls `GET /api/contact/settings/`, which does not exist - a 404 on every load | **Done** (2026-08-29 18:55) - backend built; see the backend log. Both `/contact` and `/docs` now load with zero API 4xx |
+| 12 | Uploaded photos (contact team **and** faculty) are stored but unreachable - nginx has no `location /media/`, so `/media/...` returns `index.html`. Backend open item #21 | Not started - needs a root nginx change |

@@ -1,4 +1,4 @@
-import type { SearchResult } from "../data/searchData";
+import type { FacultyMember, SearchResult } from "../data/searchData";
 import { fetchUnifiedSearch, type PublicDataset } from "./publicData";
 import {
   normalizeFacultyRecord,
@@ -28,9 +28,14 @@ interface TopicEntry {
 
 let topPapers: PaperEntry[] = [];
 let topicIndex: TopicEntry[] = [];
+let facultyIndex: FacultyMember[] = [];
 
 export function setSearchDataset(dataset?: Partial<PublicDataset>): void {
   if (!dataset) return;
+
+  // Kept whole (not just as words) because `/api/search/` ranks papers only -
+  // faculty results are matched here, against the dataset already in memory.
+  facultyIndex = dataset.facultyData ?? [];
 
   // --- Top papers by citation count (for default/cold-start suggestions) ---
   topPapers = (dataset.papersData ?? [])
@@ -177,15 +182,122 @@ export function getDidYouMean(query: string): string | null {
 }
 
 // ---------------------------------------------------------------------------
+// Faculty matching — client-side, over the dataset already in memory
+//
+// `/api/search/` ranks papers only, so a faculty search returned nothing and
+// the "Faculty Member" result card was unreachable. Rather than invent a second
+// backend ranker, this matches the faculty records the home page has already
+// downloaded from `/api/public/search-data/`.
+//
+// Two rules borrowed from the backend ranker so the two agree:
+//   * every query term must match somewhere — one common word is not a match
+//   * matches are on word boundaries, not substrings ("art" ≠ "particle")
+// ---------------------------------------------------------------------------
+
+interface FacultyField {
+  /** Where the text came from — reported back as the match evidence. */
+  source: string;
+  values: string[];
+  /** Confidence awarded when every query term is found in this field. */
+  score: number;
+}
+
+const facultyFields = (f: FacultyMember): FacultyField[] => [
+  { source: "name", values: [f.name], score: 92 },
+  { source: "research interests", values: f.researchInterests ?? [], score: 82 },
+  { source: "keywords", values: f.aiKeywords ?? [], score: 72 },
+  { source: "themes", values: f.themes ?? [], score: 68 },
+  { source: "title", values: [f.title], score: 60 },
+  {
+    source: "department",
+    values: [f.department, ...getDepartmentAffiliations(f)],
+    score: 55,
+  },
+];
+
+// Compiled once per search, not once per faculty record — the index is ~1,600
+// people wide and each has several fields.
+const termMatchers = (terms: string[]) =>
+  terms.map((term) => new RegExp(`\\b${term.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}`, "i"));
+
+const matchesAll = (value: string, matchers: RegExp[]) =>
+  matchers.every((matcher) => matcher.test(value));
+
+function scoreFaculty(faculty: FacultyMember, matchers: RegExp[], phrase: string) {
+  let best: { score: number; source: string; value: string } | null = null;
+
+  for (const field of facultyFields(faculty)) {
+    for (const value of field.values) {
+      if (!value) continue;
+      if (!matchesAll(value, matchers)) continue;
+
+      // An exact value ("Enyue Lu", "machine learning") beats the same terms
+      // scattered through a longer string, so it is not lost below weaker hits.
+      const lower = value.toLowerCase();
+      let score = field.score;
+      if (lower === phrase) score += 8;
+      else if (lower.includes(phrase)) score += 4;
+
+      if (!best || score > best.score) {
+        best = { score: Math.min(100, score), source: field.source, value };
+      }
+    }
+  }
+
+  return best;
+}
+
+function searchFacultyIndex(query: string): SearchResult[] {
+  const phrase = query.trim().toLowerCase();
+  const terms = phrase.split(/\s+/).filter((t) => t.length >= 2);
+  if (!terms.length) return [];
+
+  const matchers = termMatchers(terms);
+  const results: SearchResult[] = [];
+
+  for (const faculty of facultyIndex) {
+    const hit = scoreFaculty(faculty, matchers, phrase);
+    if (!hit) continue;
+
+    // Only surface the interests that actually matched, so the card's gold
+    // highlighting marks real evidence rather than every tag on the record.
+    const matchedKeywords = [...(faculty.researchInterests ?? []), ...(faculty.aiKeywords ?? [])]
+      .filter((k) => matchesAll(k, matchers))
+      .slice(0, 5);
+
+    results.push({
+      type: "faculty",
+      data: faculty,
+      confidence: hit.score,
+      aiJustification: `Matched on ${hit.source}: "${hit.value}".`,
+      matchedKeywords,
+      matchEvidence: {
+        match_source: hit.source,
+        match_strength: hit.value.toLowerCase() === phrase ? "exact" : "all_terms",
+        matched_value: hit.value,
+        matched_terms: terms,
+        score: hit.score,
+      },
+    });
+  }
+
+  return results.sort((a, b) => b.confidence - a.confidence);
+}
+
+// ---------------------------------------------------------------------------
 // Search — calls the backend, maps to SearchResult[]
 // ---------------------------------------------------------------------------
 
 export async function performSearch(query: string): Promise<SearchResult[]> {
   if (!query.trim()) return [];
 
+  // Faculty come from memory and papers from the backend, so a failed request
+  // degrades to faculty-only results instead of an empty page.
+  const faculty = searchFacultyIndex(query);
+
   try {
     const raw = await fetchUnifiedSearch(query);
-    return raw.map((item): SearchResult => {
+    const remote = raw.map((item): SearchResult => {
       let data: SearchResult["data"];
       if (item.type === "faculty") {
         data = normalizeFacultyRecord(item.data);
@@ -205,7 +317,8 @@ export async function performSearch(query: string): Promise<SearchResult[]> {
         matchEvidence: item.matchEvidence,
       };
     });
+    return [...faculty, ...remote].sort((a, b) => b.confidence - a.confidence);
   } catch {
-    return [];
+    return faculty;
   }
 }

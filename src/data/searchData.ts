@@ -5,7 +5,13 @@ export interface Qualification {
 }
 
 export interface FacultyMember {
+  /** Slug from the public dataset (e.g. "SU-DIR-acocella-c") - not a profile address. */
   id: string;
+  /**
+   * Numeric Faculty pk, the id `/api/faculty/<id>/public/` and `/faculty/:id` take.
+   * Absent on records that reached the UI through a payload that omits it.
+   */
+  profileId?: number;
   name: string;
   title: string;
   department: string;

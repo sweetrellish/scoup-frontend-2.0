@@ -70,8 +70,14 @@ export function normalizeFacultyRecord(recordLike: unknown): FacultyMember {
   const averageCitations = num(metricsRaw.averageCitations);
   const hasMetrics = totalCitations > 0 || articleCount > 0 || averageCitations > 0;
 
+  // The public dataset's `id` is a slug; `profileId` is the pk the profile page
+  // needs. Anything non-numeric is dropped so no dead link can be built from it.
+  const profileIdRaw = Number(r.profileId ?? r.pk);
+  const profileId = Number.isInteger(profileIdRaw) && profileIdRaw > 0 ? profileIdRaw : undefined;
+
   return {
     id: str(r.id, str(r.pk, "unknown")),
+    profileId,
     name: str(r.name, "Unnamed Faculty"),
     title: str(r.title),
     department: str(r.department, "Unassigned"),
