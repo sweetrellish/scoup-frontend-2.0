@@ -210,6 +210,67 @@ port **3000** (already allowed). Settings were not modified for testing.
 
 - **Status:** In repo, not yet built for deploy or deployed.
 
+### 2026-08-29 16:40 - GOTCHA: `src/index.css` is precompiled; unknown Tailwind classes are inert
+
+- **Restore ID:** `FE-20260829-1640`
+- **Type:** Frontend source
+- **Files changed:** the six components added/rewritten earlier today
+
+**Read this before writing any Tailwind class in this repo.**
+
+`src/index.css` is a **static, pre-generated Tailwind v4 stylesheet** (3,496 lines, header
+`/*! tailwindcss v4.1.3 */`). `package.json` has **no `tailwindcss` dependency**, there is **no
+`postcss.config.*`**, and `vite.config.ts` adds no CSS plugin - so **nothing regenerates it.**
+A class that is not already in that file produces no CSS and silently does nothing. There is no
+error, no warning, and the build succeeds.
+
+**This caused a real defect.** The review queue's active filter chip used
+`bg-gray-900 text-white`. `bg-gray-900` is not in the stylesheet, so the chip rendered **white
+text on a transparent background - invisible**. Confirmed by computed style:
+
+```
+ALL chip: { background: "rgba(0, 0, 0, 0)", color: "rgb(255, 255, 255)" }
+```
+
+**Notable absences** found while auditing (this is not the full list):
+
+| Missing | Present instead |
+| --- | --- |
+| `bg-gray-700/800/900`, `border-gray-900` | only `bg-gray-50/100/200/300` |
+| **all `sm:` grid variants** | `md:grid-cols-1..5` |
+| every `amber` shade | use the brand `#ffd100` / `#8b0000` |
+| `pl-9`, `pr-3`, `max-w-xl` | `pl-10`, `px-3`, `max-w-2xl` |
+| `text-[11px]`, `text-[10px]` | `text-xs` |
+| `h-3.5`, `w-3.5`, `mb-1.5`, `h-1.5` | `h-3`, `w-3`, `mb-1`, `h-2` |
+| `opacity-50` | `opacity-75` |
+| `tabular-nums`, `leading-snug`, `italic`, `font-mono` | no equivalent - omit |
+| opacity-modified arbitrary values (`bg-[#8b0000]/60`) | the unmodified `bg-[#8b0000]` |
+
+**Fixed in the six components from today's work.** Every class was audited against the
+stylesheet and the ~50 missing ones replaced with verified-present equivalents; decorative
+classes with no equivalent were removed rather than left dead. Re-verified in headless Chromium:
+the active chip is now `rgb(139, 0, 0)` with white text, and the stat-tile grids render four
+across.
+
+**Pre-existing, not introduced here.** `ExpertsPage.tsx` (shipped 2026-08-28) uses `pl-9`,
+`max-w-xl` and `focus:ring-[#8b0000]/30`, all inert. The new pages copied that input pattern,
+which is how the issue surfaced. ExpertsPage was left unchanged - it is a separate, already-
+deployed file - but it is degraded in the same way and is listed under planned work.
+
+**How to check before committing:** grep the stylesheet for the escaped selector. Tailwind
+escapes `[ ] # / . :` in generated class names:
+
+```bash
+grep -cF '.bg-gray-900' src/index.css        # 0 -> the class does nothing
+grep -cF '.text-\[11px\]' src/index.css      # 0 -> use text-xs
+```
+
+The proper fix is to add `tailwindcss` as a real build dependency so classes are generated from
+source. That would regenerate the whole stylesheet and risks changing the home page, which this
+log forbids, so it is recorded as planned work rather than done here.
+
+- **Status:** In repo, built successfully, not deployed.
+
 ---
 
 ## Planned work
@@ -222,3 +283,6 @@ port **3000** (already allowed). Settings were not modified for testing.
 | 4 | Remaining `ComingSoonPage` routes: Network Intelligence, Events, Verified Network, My Network | Not started - all sign-in gated |
 | 5 | Bundle is 1.15 MB; needs code-splitting | Not started |
 | 6 | `tsc` errors predating this work (versioned import specifiers, implicit `any`, `replaceAll` lib target) | Not started |
+| 7 | **`src/index.css` is precompiled and nothing regenerates it** - unknown Tailwind classes are silently inert. Add `tailwindcss` as a build dependency | Not started - see 2026-08-29 16:40 |
+| 8 | `ExpertsPage.tsx` uses inert classes (`pl-9`, `max-w-xl`, `focus:ring-[#8b0000]/30`) | Not started |
+| 9 | React "unique key prop" warning in `AdminOverviewPage` | Not started |
