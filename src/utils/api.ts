@@ -58,7 +58,11 @@ async function rawApiCall(endpoint: string, options: RequestInit = {}) {
         }
       } catch {}
     }
-    throw new Error(message);
+    // Carry the status so callers can tell "this record is not public" (404)
+    // apart from "the request failed", instead of pattern-matching the message.
+    const error = new Error(message) as Error & { status?: number };
+    error.status = res.status;
+    throw error;
   }
 
   const text = await res.text();
@@ -748,6 +752,50 @@ export const categoriesAPI = {
   list: async (): Promise<TopLevelCategory[]> => apiCall("/categories/"),
   detail: async (slug: string): Promise<CategoryDetail> =>
     apiCall(`/categories/${slug}/`),
+};
+
+// ─── Public faculty profile ───────────────────────────────────────────────────
+// GET /faculty/<pk>/public/ — AllowAny, read-only. Returns 404 for anyone whose
+// profile_visibility is off or whose review was rejected, so a 404 here means
+// "not public", not "broken".
+
+export interface PublicProfilePaper {
+  id: number;
+  title: string;
+  doi: string | null;
+  journal: string | null;
+  year: number | null;
+  citations: number;
+  url: string | null;
+}
+
+export interface PublicFacultyProfile {
+  id: number;
+  name: string;
+  title: string;
+  department: string;
+  school: string;
+  room: string;
+  phone: string;
+  photo: string | null;
+  bio: string;
+  orcid: string;
+  directoryVerified: boolean;
+  articleCount: number;
+  totalCitations: number;
+  averageCitations: number;
+  expertise: string[] | null;
+  academic: number | null;
+  practice: number | null;
+  publication: number | null;
+  keywords: string[];
+  categories: string[];
+  papers: PublicProfilePaper[];
+}
+
+export const publicProfileAPI = {
+  get: async (id: number | string): Promise<PublicFacultyProfile> =>
+    apiCall(`/faculty/${id}/public/`),
 };
 
 export { apiCall };

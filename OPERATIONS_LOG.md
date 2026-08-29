@@ -228,7 +228,7 @@ error, no warning, and the build succeeds.
 `bg-gray-900 text-white`. `bg-gray-900` is not in the stylesheet, so the chip rendered **white
 text on a transparent background - invisible**. Confirmed by computed style:
 
-```
+```terminal
 ALL chip: { background: "rgba(0, 0, 0, 0)", color: "rgb(255, 255, 255)" }
 ```
 
