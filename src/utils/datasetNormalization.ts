@@ -100,6 +100,7 @@ export function normalizePaperRecord(recordLike: unknown): Paper {
     journal: str(r.journal) || undefined,
     authors: arr(r.authors),
     year: num(r.year),
+    datePrecise: r.datePrecise !== false,
     abstract: str(r.abstract),
     link: str(r.link),
     aiKeywords: arr(r.aiKeywords),

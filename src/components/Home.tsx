@@ -171,6 +171,7 @@ export function Home({ onNavigate }: HomeProps) {
 
   // Analytics data generated from current public dataset
   const [publicationsPerYear, setPublicationsPerYear] = useState<{ year: string; publications: number }[]>([]);
+  const [imprecisePaperCount, setImprecisePaperCount] = useState(0);
   const [facultyByDepartment, setFacultyByDepartment] = useState<{ department: string; faculty: number }[]>([]);
   const [stats, setStats] = useState({
     totalPublications: 0,
@@ -202,8 +203,11 @@ export function Home({ onNavigate }: HomeProps) {
 
   useEffect(() => {
     const generateAnalytics = () => {
-      // Publications per year
-      const yearCounts = publicDataset.papersData.reduce((acc, paper) => {
+      // Publications per year - a paper whose only known date was a bare year
+      // (import defaulted it to Jan 1) is excluded from the trend so it doesn't
+      // fake a day-level data point; it's still counted in the total below.
+      const precisePapers = publicDataset.papersData.filter((paper) => paper.datePrecise !== false);
+      const yearCounts = precisePapers.reduce((acc, paper) => {
         const year = paper.year.toString();
         acc[year] = (acc[year] || 0) + 1;
         return acc;
@@ -214,6 +218,7 @@ export function Home({ onNavigate }: HomeProps) {
         .sort((a, b) => parseInt(a.year) - parseInt(b.year));
       
       setPublicationsPerYear(pubsData);
+      setImprecisePaperCount(publicDataset.papersData.length - precisePapers.length);
 
       // Faculty by department
       const deptCounts = publicDataset.facultyData.reduce((acc, faculty) => {
@@ -561,11 +566,17 @@ export function Home({ onNavigate }: HomeProps) {
                     </div>
                     <div className="mt-4 pt-4 border-t border-gray-200">
                       <div className="flex items-center justify-between text-sm">
-                        <span className="text-gray-600">Total Publications (2018-2025)</span>
+                        <span className="text-gray-600">Total Publications (dated)</span>
                         <span className="font-semibold text-[#8b0000]">
                           {publicationsPerYear.reduce((sum, item) => sum + item.publications, 0).toLocaleString()}
                         </span>
                       </div>
+                      {imprecisePaperCount > 0 && (
+                        <p className="text-sm text-gray-600 mt-2">
+                          {imprecisePaperCount.toLocaleString()} additional publications have only an
+                          approximate (year-only) date and are not shown in the trend above.
+                        </p>
+                      )}
                     </div>
                   </>
                 ) : (

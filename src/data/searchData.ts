@@ -42,6 +42,9 @@ export interface Paper {
   journal?: string;
   authors: string[];
   year: number;
+  // false when the source only ever recorded a year (import defaulted to Jan 1) -
+  // charts should not treat these as real day-level data points.
+  datePrecise?: boolean;
   abstract: string;
   link: string;
   aiKeywords: string[];
