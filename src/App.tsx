@@ -18,6 +18,7 @@ import { NetworksPage } from "./components/NetworksPage";
 import { InstitutionsPage } from "./components/InstitutionsPage";
 import { FacilitiesPage } from "./components/FacilitiesPage";
 import { BrowseCategories } from "./components/BrowseCategories";
+import { FacultyProfilePage } from "./components/FacultyProfilePage";
 import { Documentation } from "./components/Documentation";
 import { PrivacyPolicy } from "./components/PrivacyPolicy";
 import { TermsOfService } from "./components/TermsOfService";
@@ -259,6 +260,7 @@ useEffect(() => {
             <CapabilitiesPage
               title={SIDEBAR_PAGE_META[currentPath]?.title ?? "Capabilities"}
               description={SIDEBAR_PAGE_META[currentPath]?.description ?? ""}
+              onNavigate={handleNavigate}
             />
           </AppShell>
         );
@@ -271,7 +273,7 @@ useEffect(() => {
       case "/networks":
         return (
           <AppShell currentPath={currentPath} onNavigate={handleNavigate} isAuthenticated={!!userRole}>
-            <NetworksPage />
+            <NetworksPage onNavigate={handleNavigate} />
           </AppShell>
         );
       case "/institutions":
@@ -330,6 +332,15 @@ useEffect(() => {
           </AppShell>
         );
       default: {
+        // Public faculty profile: /faculty/<id>
+        if (currentPath.startsWith("/faculty/")) {
+          const facultyId = currentPath.slice("/faculty/".length);
+          return (
+            <AppShell currentPath={currentPath} onNavigate={handleNavigate} isAuthenticated={!!userRole}>
+              <FacultyProfilePage facultyId={facultyId} onNavigate={handleNavigate} />
+            </AppShell>
+          );
+        }
         // Handle /browse/<slug> detail routes
         if (currentPath.startsWith("/browse/")) {
           const slug = currentPath.slice("/browse/".length);

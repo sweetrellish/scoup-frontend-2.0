@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Search as SearchIcon } from "lucide-react";
 
 import { networkAPI } from "../utils/api";
+import { FacultyLink } from "./FacultyLink";
 
 interface ExpertsPageProps {
   onNavigate: (path: string) => void;
@@ -95,7 +96,15 @@ export function ExpertsPage({ onNavigate }: ExpertsPageProps) {
             >
               <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0">
-                  <p className="font-medium text-gray-900 truncate">{expert.name}</p>
+                  <p className="font-medium truncate">
+                    <FacultyLink
+                      facultyId={expert.id}
+                      onNavigate={onNavigate}
+                      className="text-gray-900 hover:text-[#8b0000]"
+                    >
+                      {expert.name}
+                    </FacultyLink>
+                  </p>
                   <p className="text-xs text-gray-600 truncate">
                     {[expert.title, expert.department].filter(Boolean).join(" · ")}
                   </p>

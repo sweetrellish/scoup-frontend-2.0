@@ -2,14 +2,16 @@ import { useEffect, useMemo, useState } from "react";
 import { Search as SearchIcon, ChevronLeft, Users, FileText } from "lucide-react";
 
 import { categoriesAPI, type TopLevelCategory, type CategoryDetail } from "../utils/api";
+import { FacultyLink } from "./FacultyLink";
 
 interface CapabilitiesPageProps {
   title: string;
   description: string;
+  onNavigate: (path: string) => void;
 }
 
 /** Capability areas grouped from real research profiles; drills into the experts behind each. */
-export function CapabilitiesPage({ title, description }: CapabilitiesPageProps) {
+export function CapabilitiesPage({ title, description, onNavigate }: CapabilitiesPageProps) {
   const [categories, setCategories] = useState<TopLevelCategory[]>([]);
   const [query, setQuery] = useState("");
   const [selected, setSelected] = useState<CategoryDetail | null>(null);
@@ -112,7 +114,15 @@ export function CapabilitiesPage({ title, description }: CapabilitiesPageProps) 
           <ul className="grid gap-3 md:grid-cols-2">
             {selected.faculty.slice(0, 40).map((f) => (
               <li key={f.id} className="bg-white border border-gray-200 rounded-lg p-4">
-                <p className="font-medium text-gray-900">{f.name}</p>
+                <p className="font-medium">
+                  <FacultyLink
+                    facultyId={f.id}
+                    onNavigate={onNavigate}
+                    className="text-gray-900 hover:text-[#8b0000]"
+                  >
+                    {f.name}
+                  </FacultyLink>
+                </p>
                 <p className="text-xs text-gray-600">
                   {[f.title, f.department].filter(Boolean).join(" · ") || "Salisbury University"}
                 </p>

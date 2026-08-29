@@ -33,6 +33,7 @@ import { Badge } from "./ui/badge";
 import { Button } from "./ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
+import { FacultyLink } from "./FacultyLink";
 
 // ─── helpers ─────────────────────────────────────────────────────────────────
 
@@ -242,7 +243,7 @@ function BrowseIndex({ onCategoryClick }: { onCategoryClick: (slug: string) => v
 const FACULTY_PER_PAGE = 4;
 const THEMES_PER_PAGE = 3;
 
-function BrowseDetail({ slug, onBack }: { slug: string; onBack: () => void }) {
+function BrowseDetail({ slug, onBack, onNavigate }: { slug: string; onBack: () => void; onNavigate: (path: string) => void }) {
   const [data, setData] = useState<CategoryDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -312,6 +313,13 @@ function BrowseDetail({ slug, onBack }: { slug: string; onBack: () => void }) {
   const selectedFacultyName = selectedFacultyId !== null
     ? (data.faculty.find((f) => f.id === selectedFacultyId)?.name ?? null)
     : null;
+
+  // Paper author lists include external co-authors who have no public profile.
+  // Only link the ones this category already lists as visible faculty, so a
+  // linked name is always a name with a profile behind it.
+  const linkableAuthorIds = new Set(
+    data.faculty.filter((f) => f.profile_visibility).map((f) => f.id),
+  );
 
   return (
     <>
@@ -514,6 +522,15 @@ function BrowseDetail({ slug, onBack }: { slug: string; onBack: () => void }) {
                             <h2 className="text-[0.9375rem] font-semibold text-gray-900 leading-tight">{sf.name}</h2>
                             {sf.title && <p className="text-xs text-gray-500 mt-0.5">{sf.title}</p>}
                             {sf.department && <p className="text-xs text-gray-400">{sf.department}</p>}
+                            {sf.profile_visibility && (
+                              <FacultyLink
+                                facultyId={sf.id}
+                                onNavigate={onNavigate}
+                                className="text-xs font-medium text-[#8b0000] hover:underline"
+                              >
+                                View full profile
+                              </FacultyLink>
+                            )}
                           </div>
                         </div>
                         <FacultyInquiryButton faculty={sf} />
@@ -589,6 +606,7 @@ function BrowseDetail({ slug, onBack }: { slug: string; onBack: () => void }) {
                       <div className="space-y-4">
                         {filteredPapers.map((paper) => (
                           <PaperCard key={paper.id} paper={paper} activeTheme={selectedTheme}
+                            linkableAuthorIds={linkableAuthorIds} onNavigate={onNavigate}
                             onThemeClick={(t) => setSelectedTheme(selectedTheme === t ? null : t)} />
                         ))}
                       </div>
@@ -623,6 +641,7 @@ function BrowseDetail({ slug, onBack }: { slug: string; onBack: () => void }) {
                   <div className="space-y-4">
                     {filteredPapers.map((paper) => (
                       <PaperCard key={paper.id} paper={paper} activeTheme={selectedTheme}
+                        linkableAuthorIds={linkableAuthorIds} onNavigate={onNavigate}
                         onThemeClick={(t) => setSelectedTheme(selectedTheme === t ? null : t)} />
                     ))}
                     {filteredPapers.length === 0 && (
@@ -640,6 +659,7 @@ function BrowseDetail({ slug, onBack }: { slug: string; onBack: () => void }) {
                     {data.faculty.map((f) => (
                       <FacultyCard key={f.id} faculty={f}
                         active={selectedFacultyId === f.id}
+                        onNavigate={onNavigate}
                         onClick={() => { setSelectedFacultyId(f.id); setSelectedTheme(null); setSearchQuery(""); }} />
                     ))}
                   </div>
@@ -655,10 +675,12 @@ function BrowseDetail({ slug, onBack }: { slug: string; onBack: () => void }) {
 
 // ─── Paper card ───────────────────────────────────────────────────────────────
 
-function PaperCard({ paper, activeTheme, onThemeClick }: {
+function PaperCard({ paper, activeTheme, onThemeClick, linkableAuthorIds, onNavigate }: {
   paper: CategoryPaper;
   activeTheme: string | null;
   onThemeClick: (t: string) => void;
+  linkableAuthorIds: Set<number>;
+  onNavigate: (path: string) => void;
 }) {
   const href = paper.download_url || (paper.doi ? `https://doi.org/${paper.doi}` : null);
   return (
@@ -674,7 +696,18 @@ function PaperCard({ paper, activeTheme, onThemeClick }: {
             <h3 className="text-xl font-semibold text-gray-900">{paper.title}</h3>
           )}
           <p className="text-sm text-gray-600 mt-1 mb-2">
-            {paper.authors.map((a) => a.name).join(", ")}
+            {paper.authors.map((a, i) => (
+              <span key={`${a.id}-${i}`}>
+                {i > 0 && ", "}
+                <FacultyLink
+                  facultyId={linkableAuthorIds.has(a.id) ? a.id : null}
+                  onNavigate={onNavigate}
+                  className="hover:text-[#8b0000] transition-colors"
+                >
+                  {a.name}
+                </FacultyLink>
+              </span>
+            ))}
           </p>
           <div className="flex flex-wrap items-center gap-3 text-sm text-gray-500 mb-3">
             {paper.journal && <span>{paper.journal}</span>}
@@ -849,10 +882,11 @@ function FacultyInquiryButton({ faculty }: { faculty: CategoryFaculty }) {
 
 // ─── Faculty card ─────────────────────────────────────────────────────────────
 
-function FacultyCard({ faculty, active, onClick }: {
+function FacultyCard({ faculty, active, onClick, onNavigate }: {
   faculty: CategoryFaculty;
   active: boolean;
   onClick: () => void;
+  onNavigate: (path: string) => void;
 }) {
   return (
     <>
@@ -868,7 +902,15 @@ function FacultyCard({ faculty, active, onClick }: {
             </AvatarFallback>
           </Avatar>
           <div className="flex-1 min-w-0">
-            <h3 className="text-lg font-semibold text-gray-900">{faculty.name}</h3>
+            <h3 className="text-lg font-semibold">
+              <FacultyLink
+                facultyId={faculty.profile_visibility ? faculty.id : null}
+                onNavigate={onNavigate}
+                className="text-gray-900 hover:text-[#8b0000] transition-colors"
+              >
+                {faculty.name}
+              </FacultyLink>
+            </h3>
             {faculty.title && <p className="text-sm text-gray-600">{faculty.title}</p>}
             {faculty.department && <p className="text-sm text-gray-500">{faculty.department}</p>}
             <div className="flex gap-4 mt-1 text-sm text-[#8b0000] font-medium">
@@ -889,6 +931,15 @@ function FacultyCard({ faculty, active, onClick }: {
             </a>
           )}
           <FacultyInquiryButton faculty={faculty} />
+          {faculty.profile_visibility && (
+            <FacultyLink
+              facultyId={faculty.id}
+              onNavigate={onNavigate}
+              className="ml-auto text-xs font-medium text-[#8b0000] hover:underline"
+            >
+              View profile
+            </FacultyLink>
+          )}
         </div>
       </Card>
     </>
@@ -915,7 +966,7 @@ export function BrowseCategories({
     <div className="min-h-screen flex flex-col bg-gray-50">
       <Navbar onNavigate={onNavigate} currentPath={currentPath} />
       {slug ? (
-        <BrowseDetail slug={slug} onBack={handleBack} />
+        <BrowseDetail slug={slug} onBack={handleBack} onNavigate={onNavigate} />
       ) : (
         <BrowseIndex onCategoryClick={handleSelect} />
       )}

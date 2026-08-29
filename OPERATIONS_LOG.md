@@ -271,6 +271,138 @@ log forbids, so it is recorded as planned work rather than done here.
 
 - **Status:** In repo, built successfully, not deployed.
 
+### 2026-08-29 18:35 - Public faculty profile page, and faculty names made linkable
+
+- **Restore ID:** `FE-20260829-1835`
+- **Type:** Frontend source
+- **Artifact:** `~/scoup-backups/frontend/src.before-facultyprofile.20260829-180203.tar.gz`
+- **Files added:** `src/components/FacultyProfilePage.tsx`, `src/components/FacultyLink.tsx`
+- **Files changed:** `src/App.tsx`, `src/utils/api.ts`, `src/components/ExpertsPage.tsx`,
+  `src/components/NetworksPage.tsx`, `src/components/CapabilitiesPage.tsx`,
+  `src/components/BrowseCategories.tsx`
+
+`GET /api/faculty/<pk>/public/` has been deployed since the backend added
+`academic/public_profile_views.py`, but **no page in the frontend called it and no link
+anywhere pointed at a person.** Faculty names rendered as dead text on every page that listed
+them. This adds the page and the links.
+
+**New route `/faculty/<id>`,** registered in the `default:` branch of the hand-rolled router in
+`App.tsx` next to the existing `/browse/<slug>` prefix match. It renders inside `AppShell`
+rather than the `Navbar`/`Footer` chrome: the profile is a Discover artifact, and the sidebar it
+inherits contains Experts, Networks and Capabilities - the three pages people arrive from. The
+trade-off is that arriving from `/browse` swaps the public navbar for the sidebar.
+
+**What the page shows** - header (photo or initials, name, directory-verified badge, title,
+department, school, bio), a three-tile metric row, a contact card, research topics, and the
+paper list.
+
+| Detail | Decision |
+| --- | --- |
+| Phone | Every one of the 150 populated `phone` values is a **5-digit campus extension**, not a dialable number. Labelled "Campus extension" and **not** wrapped in a `tel:` link - constructing a full number would be a guess. |
+| Email | Not shown. The endpoint withholds it deliberately; introductions run through the existing throttled inquiry flow. |
+| Research topics | `expertise` is `[]` on essentially every record; `keywords` is the populated field. The page prefers `expertise` and falls back to `keywords`, rather than rendering an empty section. |
+| Paper links | `url` first, then `https://doi.org/<doi>`, then plain text. |
+| Paper count line | Says "31 papers, most cited first" when the list is complete and "Showing the 50 most cited of N" when the endpoint's cap of 50 truncates it, so the cap is never silently hidden. |
+
+**Three distinct failure states, because they are three different facts.**
+
+| Condition | Renders |
+| --- | --- |
+| 404 from the endpoint | *Profile not available* - explains that visibility is the faculty member's choice and that records awaiting review are hidden, so absence is not evidence the person is missing |
+| Non-numeric id (`/faculty/not-a-number`) | *That is not a profile address* - the id is malformed, which is not the same as a hidden profile, and saying "not published" there would be untrue |
+| Any other error | *Could not load this profile* with the message, explicitly labelled a request failure |
+
+Telling 404 apart from a transport error needed a status code, which `apiCall` was discarding.
+`rawApiCall` in `src/utils/api.ts` now attaches `error.status = res.status` before throwing.
+This is additive - the existing 401-refresh path still matches on the message and is unaffected.
+
+**Faculty names are now links in five places,** via a new shared `FacultyLink` component. It
+renders a real `<a href="/faculty/<id>">` so the URL is visible on hover, copyable and
+openable in a new tab; modified clicks (ctrl/cmd/shift/alt/middle) are left to the browser and
+only a plain left click is intercepted for client-side navigation. It also `stopPropagation()`s,
+so clicking a name inside a card that has its own `onClick` navigates instead of filtering.
+
+| Page | What became a link |
+| --- | --- |
+| Experts | expert name on each card (40 links) |
+| Networks | member names in each department cluster (56 links) |
+| Capabilities / Expertise Map | "Experts behind this capability" names (11 on Computer science) |
+| Browse - Faculty tab | faculty name **and** a "View profile" action on each card |
+| Browse - drill-down card | "View full profile", placed after the department line |
+| Browse - paper cards | author names |
+
+**Paper author names are linked selectively, not blindly.** `paper.authors` from
+`/api/categories/<slug>/` carries a real `Faculty.pk` for every author, but that list includes
+external co-authors who are not in `_visible_faculty_qs()` and would 404. Only authors that the
+same category response already lists in its visibility-filtered `faculty[]` array are linked;
+everyone else stays plain text. 116 author links render on `computer-science`, and none of them
+is a guess. For the same reason `FacultyLink` renders plain text whenever the id is not numeric
+or no navigate handler was passed - it can never produce a link that goes nowhere.
+
+**Home-page search was deliberately left alone.** `SearchResults.tsx` / `FacultySlideOver.tsx`
+are driven by `/api/public/search-data/`, whose faculty `id` is `str(item.faculty_id)` - the
+`SU-DIR-acocella-c` style slug, **not** the primary key the profile endpoint needs. Linking it
+would require adding the pk to that payload, which is a backend change and a deploy; per this
+session's instructions the live deployment was not touched. Recorded as planned work #10.
+(`FacultyLink` would degrade those ids to plain text safely, so wiring it there today would
+produce nothing but dead weight.)
+
+**Stylesheet discipline.** Every class in both new files was checked against `src/index.css`
+before committing, using the escaped-selector method from the 2026-08-29 16:40 entry - both
+files come back clean. `hover:bg-[#6f0000]` was written first and caught as inert (no darker
+brand red exists in the stylesheet at all); the filled buttons use `hover:shadow-md
+transition-shadow` instead. A before/after diff of the class audit on `BrowseCategories.tsx`
+confirms **no new dead classes were introduced** - the ones it reports (`border-l-4`,
+`h-3.5`, `mb-1.5`, `lg:grid-cols-[280px_1fr]` and others) all predate this work.
+
+**Verification - rendered against the live API, not mocked.** `dist/` was served on port 4173
+by a local static server with SPA fallback that reverse-proxies `/api/*` to
+`https://scoup-salisbury.net`. Because the bundle is built with `VITE_API_BASE_URL=/api`, API
+calls are same-origin - this reproduces production exactly and avoids CORS entirely, so
+`scoupdb/settings.py` did not have to be touched. Driven with Playwright over the system
+Chromium at `/usr/bin/chromium-browser` (the bundled browser needs Node 20; this box has 18).
+
+| Check | Result |
+| --- | --- |
+| `/faculty/405` direct load | "Enyue Lu", Professor - Computer Science, Henson School; Papers 31 / Citations 119 / Avg 3.84 - matching the API byte for byte |
+| Verified badge computed style | `oklch(0.982 0.018 155.826)` on `oklch(0.527 0.154 150.069)` - green on green, not the invisible-chip failure mode |
+| Papers rendered | 31 items, 31 DOI links, correct order (27, 18, 16, 9, ... cited) |
+| ORCID link | `https://orcid.org/0009-0008-7283-4617` |
+| Experts -> name -> profile -> Back | `/experts` -> `/faculty/681` (Chao Miao) -> back to `/experts` |
+| Networks -> name -> profile | `/faculty/681`, heading matches |
+| Capabilities -> Computer science -> expert | 11 links, `/faculty/708` (Asif Shakur) |
+| Browse -> Faculty tab -> profile | 22 links (11 names + 11 "View profile"), lands on `/faculty/708` |
+| Browse -> drill-down -> View full profile | lands on `/faculty/708` |
+| Browse -> paper author link | 116 author links; clicking "Enyue Lu" lands on `/faculty/405` |
+| `/faculty/999999` | *Profile not available* (the 404 is the endpoint's, and is expected) |
+| `/faculty/not-a-number` | *That is not a profile address*, with no request sent |
+| Smoke test, 14 routes | all render their correct `h1`; **zero** console errors and zero failed requests everywhere except `/docs` (see open items) |
+
+`npm run build` succeeds (2,327 modules, `index-*.js` 1.15 MB). Built with
+`env -u VITE_API_BASE_URL` and the bundle re-checked for `onrender` (0 occurrences) per the
+backend log's `INCIDENT-20260829-1749`. `npx tsc --noEmit` reports **no new errors**; the one
+it flags in `BrowseCategories.tsx` is pre-existing, confirmed by re-running against a stashed
+tree (it simply moved from line 842 to 875).
+
+**Two things found while working, neither introduced here.**
+
+1. `CapabilitiesPage.tsx` carries the same inert classes as `ExpertsPage.tsx`
+   (`pl-9`, `pr-3`, `max-w-xl`, `text-[11px]`, `mt-5`, `lg:grid-cols-3`,
+   `focus:ring-[#8b0000]/30`, `hover:border-[#8b0000]/40`). It was not among the six files
+   audited on 2026-08-29 16:40. Left unchanged - repairing already-shipped pages is separate
+   work, not part of this task - and folded into planned work #8.
+2. `/docs` requests `GET /api/contact/settings/`, which **does not exist on the backend**
+   (`curl` against the live site returns 404, and there is no such route in `academic/urls.py`).
+   Harmless today, but it is a real 404 on every page load.
+
+**Note on repo state.** Commits `f441e78`, `e54b455` and `2d93a23` were made in this repository
+by another actor while this work was in progress; `f441e78` swept up the in-progress
+`src/utils/api.ts` edits from this task. Nothing was lost, but this branch was not exclusively
+held during the change.
+
+- **Status:** In repo, built successfully, **not deployed** - `/var/www` was left untouched by
+  instruction.
+
 ---
 
 ## Planned work
@@ -284,5 +416,7 @@ log forbids, so it is recorded as planned work rather than done here.
 | 5 | Bundle is 1.15 MB; needs code-splitting | Not started |
 | 6 | `tsc` errors predating this work (versioned import specifiers, implicit `any`, `replaceAll` lib target) | Not started |
 | 7 | **`src/index.css` is precompiled and nothing regenerates it** - unknown Tailwind classes are silently inert. Add `tailwindcss` as a build dependency | Not started - see 2026-08-29 16:40 |
-| 8 | `ExpertsPage.tsx` uses inert classes (`pl-9`, `max-w-xl`, `focus:ring-[#8b0000]/30`) | Not started |
+| 8 | `ExpertsPage.tsx` **and `CapabilitiesPage.tsx`** use inert classes (`pl-9`, `pr-3`, `max-w-xl`, `text-[11px]`, `focus:ring-[#8b0000]/30`) | Not started - see 2026-08-29 18:35 |
 | 9 | React "unique key prop" warning in `AdminOverviewPage` | Not started |
+| 10 | Home-page search results cannot link to `/faculty/<id>`: `/api/public/search-data/` returns `faculty_id` slugs, not the pk. Needs the pk added to that payload (backend + deploy) | Not started - see 2026-08-29 18:35 |
+| 11 | `/docs` calls `GET /api/contact/settings/`, which does not exist - a 404 on every load | Not started - found 2026-08-29 18:35 |

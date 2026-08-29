@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Search as SearchIcon, Users, FileText, Info, Building2 } from "lucide-react";
 
 import { networkAPI } from "../utils/api";
+import { FacultyLink } from "./FacultyLink";
 
 /**
  * Collaboration structure around a research topic.
@@ -55,7 +56,11 @@ interface DepartmentCluster {
   keywords: string[];
 }
 
-export function NetworksPage() {
+interface NetworksPageProps {
+  onNavigate: (path: string) => void;
+}
+
+export function NetworksPage({ onNavigate }: NetworksPageProps) {
   const [query, setQuery] = useState("");
   const [data, setData] = useState<DiscoveryResponse | null>(null);
   const [loading, setLoading] = useState(true);
@@ -247,7 +252,13 @@ export function NetworksPage() {
                   <ul className="mt-3 space-y-1">
                     {cluster.members.slice(0, 4).map((member) => (
                       <li key={member.id} className="text-sm text-gray-700 flex items-center gap-2">
-                        <span className="truncate">{member.name}</span>
+                        <FacultyLink
+                          facultyId={member.id}
+                          onNavigate={onNavigate}
+                          className="truncate hover:text-[#8b0000]"
+                        >
+                          {member.name}
+                        </FacultyLink>
                         {member.directoryVerified && (
                           <span className="text-xs text-green-700 shrink-0">verified</span>
                         )}
