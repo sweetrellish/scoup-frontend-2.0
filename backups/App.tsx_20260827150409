@@ -8,10 +8,6 @@ import { FacultyDashboard } from "./components/FacultyDashboard";
 import { AdminDashboard } from "./components/AdminDashboard";
 import { Contact } from "./components/Contact";
 import { ResetPassword } from "./components/ResetPassword";
-import { AppShell } from "./components/AppShell";
-import { ExpertsPage } from "./components/ExpertsPage";
-import { CapabilitiesPage } from "./components/CapabilitiesPage";
-import { ComingSoonPage } from "./components/ComingSoonPage";
 import { BrowseCategories } from "./components/BrowseCategories";
 import { Documentation } from "./components/Documentation";
 import { PrivacyPolicy } from "./components/PrivacyPolicy";
@@ -22,21 +18,6 @@ import { FloatingSupportButton } from "./components/FloatingSupportButton";
 
 type UserRole = "admin" | "faculty" | null;
 const ROLE_STORAGE_KEY = "scoupUserRole";
-
-const SIDEBAR_PAGE_META: Record<string, { title: string; description: string; endpoint?: string }> = {
-  "/search": { title: "Search", description: "Unified search across papers, faculty and projects.", endpoint: "/api/search/" },
-  "/expertise-map": { title: "Expertise Map", description: "Browse institutional research strengths, then drill into the experts behind each area.", endpoint: "/api/categories/" },
-  "/networks": { title: "Networks", description: "Collaboration networks across the institution.", endpoint: "/api/network/discovery/" },
-  "/capabilities": { title: "Capabilities", description: "Representative capability areas grouped from the network\u2019s real research profiles. Search to find a capability, then see the experts behind it.", endpoint: "/api/categories/" },
-  "/projects": { title: "Projects", description: "Funded and active research projects.", endpoint: "/api/projects/" },
-  "/labs": { title: "Labs", description: "Research labs and groups." },
-  "/facilities": { title: "Facilities", description: "Shared instrumentation and facilities." },
-  "/institutions": { title: "Institutions", description: "Partner and peer institutions." },
-  "/network-intelligence": { title: "Network Intelligence", description: "Analytics across the verified network." },
-  "/events": { title: "Events", description: "Research events and calls." },
-  "/verified-network": { title: "Verified Network", description: "Directory-verified faculty." },
-  "/my-network": { title: "My Network", description: "Your saved contacts and introductions.", endpoint: "/api/faculty/inquiries/" },
-};
 
 const normalizePath = (path: string) => {
   if (!path || path === "") return "/";
@@ -240,41 +221,6 @@ useEffect(() => {
             onLoginSuccess={() => handleLogin("admin")}
             onBack={() => handleNavigate("/")}
           />
-        );
-      case "/experts":
-        return (
-          <AppShell currentPath={currentPath} onNavigate={handleNavigate} isAuthenticated={!!userRole}>
-            <ExpertsPage onNavigate={handleNavigate} />
-          </AppShell>
-        );
-      case "/capabilities":
-      case "/expertise-map":
-        return (
-          <AppShell currentPath={currentPath} onNavigate={handleNavigate} isAuthenticated={!!userRole}>
-            <CapabilitiesPage
-              title={SIDEBAR_PAGE_META[currentPath]?.title ?? "Capabilities"}
-              description={SIDEBAR_PAGE_META[currentPath]?.description ?? ""}
-            />
-          </AppShell>
-        );
-      case "/search":
-      case "/networks":
-      case "/projects":
-      case "/labs":
-      case "/facilities":
-      case "/institutions":
-      case "/network-intelligence":
-      case "/events":
-      case "/verified-network":
-      case "/my-network":
-        return (
-          <AppShell currentPath={currentPath} onNavigate={handleNavigate} isAuthenticated={!!userRole}>
-            <ComingSoonPage
-              title={SIDEBAR_PAGE_META[currentPath]?.title ?? "Page"}
-              description={SIDEBAR_PAGE_META[currentPath]?.description ?? ""}
-              endpoint={SIDEBAR_PAGE_META[currentPath]?.endpoint}
-            />
-          </AppShell>
         );
       default: {
         // Handle /browse/<slug> detail routes

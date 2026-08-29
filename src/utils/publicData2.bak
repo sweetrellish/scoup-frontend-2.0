@@ -54,78 +54,62 @@ export interface UnifiedSearchResult {
   data: Record<string, unknown>;
 }
 
-// ============================================================================
-// IMPROVED CONFIDENCE CALCULATION
-// ============================================================================
-
+// Helper to calculate match confidence - improved algorithm
 function calculateConfidence(paper: any, query: string): number {
   const queryLower = query.toLowerCase().trim();
   const queryTerms = queryLower.split(/\s+/).filter(t => t.length > 2);
   
   const titleLower = (paper.title || "").toLowerCase();
   const abstractLower = (paper.abstract || "").toLowerCase();
-  const keywordsLower = ((paper.aiKeywords || []).map((k: string) => k.toLowerCase()) || []);
+  const keywordsLower = ((paper.aiKeywords || []).map(k => k.toLowerCase()) || []);
   
   let score = 0;
-  let matchCount = 0;
   
-  // 1. Exact phrase match in title = 100
+  // Exact phrase match in title = highest confidence
   if (titleLower.includes(queryLower)) {
-    return 100;
-  }
-  
-  // 2. Title has ALL query terms = 95
-  if (queryTerms.every(term => titleLower.includes(term))) {
     return 95;
   }
   
-  // 3. Title keyword matches
+  // All query terms in title
+  if (queryTerms.every(term => titleLower.includes(term))) {
+    return 90;
+  }
+  
+  // Count matching terms in title
   const titleMatches = queryTerms.filter(term => titleLower.includes(term)).length;
   if (titleMatches > 0) {
-    score = Math.max(score, 85 + (titleMatches / queryTerms.length) * 10);
-    matchCount += titleMatches;
+    score = Math.max(score, 70 + (titleMatches / queryTerms.length) * 15);
   }
   
-  // 4. Exact phrase in abstract = 80
+  // Exact phrase match in abstract
   if (abstractLower.includes(queryLower)) {
-    return 80;
+    return 85;
   }
   
-  // 5. Abstract has ALL query terms = 75
+  // All query terms in abstract
   if (queryTerms.every(term => abstractLower.includes(term))) {
     return 75;
   }
   
-  // 6. Abstract keyword matches
+  // Count matching terms in abstract
   const abstractMatches = queryTerms.filter(term => abstractLower.includes(term)).length;
   if (abstractMatches > 0) {
-    score = Math.max(score, 65 + (abstractMatches / queryTerms.length) * 15);
-    matchCount += abstractMatches;
+    score = Math.max(score, 50 + (abstractMatches / queryTerms.length) * 25);
   }
   
-  // 7. Keywords match
+  // Keywords match
   const keywordMatches = queryTerms.filter(term => 
     keywordsLower.some(kw => kw.includes(term) || term.includes(kw))
   ).length;
   if (keywordMatches > 0) {
-    score = Math.max(score, 50 + (keywordMatches / queryTerms.length) * 20);
-    matchCount += keywordMatches;
+    score = Math.max(score, 40 + (keywordMatches / queryTerms.length) * 25);
   }
   
-  // 8. Boost for recency (papers from 2015+ get bonus)
-  if (paper.year && paper.year > 2014) {
-    score += Math.min(5, (paper.year - 2014) * 0.3);
-  }
-  
-  // 9. Boost for citations
-  if (paper.citations && paper.citations > 0) {
-    score += Math.min(10, Math.log(paper.citations) * 2);
-  }
-  
-  // No matches = return 0
-  return matchCount === 0 ? 0 : Math.min(100, Math.round(score));
+  // If no matches at all, return 0 (will be filtered out)
+  return Math.max(0, Math.round(score));
 }
 
+// Helper to extract matched keywords
 function extractKeywords(paper: any, query: string): string[] {
   const queryTerms = query.toLowerCase().split(/\s+/).filter(t => t.length > 2);
   const paperKeywords = [...(paper.aiKeywords || []), ...(paper.keywords || [])];
@@ -144,24 +128,19 @@ export async function fetchUnifiedSearch(query: string): Promise<UnifiedSearchRe
   
   const data = await response.json();
   
-  // Transform and filter by confidence
+  // Transform raw API results to UnifiedSearchResult format
   return Array.isArray(data?.results) 
-    ? data.results
-        .map(paper => {
-          const confidence = calculateConfidence(paper, trimmed);
-          return {
-            type: "paper" as const,
-            data: paper,
-            confidence,
-            aiJustification: `Paper about ${paper.title}`,
-            matchedKeywords: extractKeywords(paper, trimmed),
-            matchEvidence: "Backend keyword search"
-          };
-        })
-        .filter(r => r.confidence > 0)  // Only return matches with score > 0
-        .sort((a, b) => b.confidence - a.confidence)  // Sort by confidence
+    ? data.results.map(paper => ({
+        type: "paper" as const,
+        data: paper,
+        confidence: calculateConfidence(paper, trimmed),
+        aiJustification: `Paper about ${paper.title}`,
+        matchedKeywords: extractKeywords(paper, trimmed),
+        matchEvidence: "Backend keyword search"
+      }))
     : [];
 }
+
 export async function fetchSemanticPaperResults(
   query: string,
   limit = 20

@@ -17,3 +17,6 @@ docs/SCOUP-Presentation-Prep.docx
 docs/make-presentation-prep.js
 docs/node_modules/
 docs/package*.json
+
+#Scripts
+*.sh
