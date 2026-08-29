@@ -21,3 +21,7 @@ docs/package*.json
 #Scripts
 *.sh
 Screenshot*.*
+
+# Old manual backup dumps and reference screenshots - not source, not needed in git
+backups/
+refs/
