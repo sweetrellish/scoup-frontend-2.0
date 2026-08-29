@@ -146,12 +146,79 @@ guess.
   2026-08-29 15:20 entry in the backend log.
 - **Status:** In repo, not yet built or deployed.
 
+### 2026-08-29 16:10 - Six sidebar pages wired to real data or honest empty states
+
+- **Restore ID:** `FE-20260829-1610`
+- **Type:** Frontend source
+- **Artifact:** `~/scoup-backups/frontend/src.before-reviewqueue.20260829-152058.tar.gz`
+- **Files added:** `src/components/SearchPage.tsx`, `src/components/NetworksPage.tsx`,
+  `src/components/InstitutionsPage.tsx`, `src/components/FacilitiesPage.tsx`,
+  `src/components/NoDataYetPage.tsx`
+- **Files changed:** `src/App.tsx`, `src/utils/api.ts`
+
+Closes backend open item #5. Four pages now carry real data; two are empty **because the data
+is empty**, and say so rather than showing invented rows.
+
+| Page | Source | What it shows |
+| --- | --- | --- |
+| Search | `GET /api/search/` | 30 ranked papers, confidence, matched fields, filters |
+| Networks | `GET /api/network/discovery/` | 60 researchers across 24 departments / 5 schools |
+| Institutions | `GET /api/institutions/` | 91 cleaned institutions with merge provenance |
+| Facilities | `GET /api/facilities/` | 91 buildings, 162 faculty placed in 9 of them |
+| Projects | - | honest empty state (Project table is empty) |
+| Labs | - | honest empty state (no data source exists) |
+
+**Search is not redundant with the home page search bar.** The home page calls
+`performSearch()` in `src/utils/searchEngine.ts`, which ranks a dataset **downloaded into the
+browser** from `/api/public/search-data/`. This page calls `/api/search/`, so it uses the
+backend ranker over the full corpus and can filter by year, journal, citations and abstract
+presence - constraints the client-side engine has no equivalent for. Each result shows the
+ranker's confidence and which fields matched, so a surprising hit is explainable.
+
+**Networks is not redundant with Experts.** Experts answers *who matches best* and returns a
+ranked list of people. Networks answers *how work on this topic connects*: it clusters the same
+discovery response by department, ranks the keywords bridging each cluster, flags papers that
+span more than one department, and surfaces the query expansion the backend applied - so a
+result set broader than the phrase typed is explainable rather than mysterious.
+
+**`NoDataYetPage` is a new component, distinct from `ComingSoonPage`.** ComingSoon means "not
+built yet". NoDataYet means "built, connected, and legitimately empty", and states what exists,
+why it is empty, and what would fill it. Projects notes that the model exists but
+`/api/projects/` is auth-scoped to a faculty member's own projects, so there is no public data;
+Labs notes that no model, endpoint or dataset exists at all.
+
+**Verification - rendered, not just compiled.** All six routes were loaded in headless Chromium
+against a backend running on a **throwaway copy** of the database, and screenshotted:
+
+| Check | Result |
+| --- | --- |
+| all six routes render with correct headings | pass |
+| console errors / failed requests | none |
+| Networks | 60 researchers, 24 departments, 5 schools, 60 papers |
+| Facilities | 91 buildings, 105 codes, 9 occupied, 162 faculty placed |
+| Institutions | 91 of 91 listed |
+| Search with "machine learning" | 30 results, 100% confidence top hits, matched-field chips |
+| Search with `year_min=2020` applied through the UI | filter chip shows (1), results all >= 2020 |
+
+`npm run build` succeeds (2,323 modules). `npx tsc --noEmit` reports no errors in any new file;
+the errors it does report are pre-existing (versioned import specifiers resolved by Vite
+aliases, implicit `any` in `publicData.ts`, `replaceAll` lib target, `main.tsx` extension).
+
+**Note on the dev-server check.** CORS in `scoupdb/settings.py` uses a hardcoded
+`FRONTEND_ORIGINS` list with no environment override, so the verification server had to run on
+port **3000** (already allowed). Settings were not modified for testing.
+
+- **Status:** In repo, not yet built for deploy or deployed.
+
 ---
 
 ## Planned work
 
 | # | Item | Status |
 | --- | --- | --- |
-| 1 | Port sidebar navigation from `~/scoup-frontend` schema | Not started |
-| 2 | Add sidebar sub-pages, preserving existing home page | Not started |
-| 3 | Wire category browsing to `/api/categories/` once backend returns real data | Blocked on backend |
+| 1 | Port sidebar navigation from `~/scoup-frontend` schema | Done (2026-08-28 23:56) |
+| 2 | Add sidebar sub-pages, preserving existing home page | Done (2026-08-29 16:10) |
+| 3 | Wire category browsing to `/api/categories/` once backend returns real data | Done - Capabilities / Expertise Map |
+| 4 | Remaining `ComingSoonPage` routes: Network Intelligence, Events, Verified Network, My Network | Not started - all sign-in gated |
+| 5 | Bundle is 1.15 MB; needs code-splitting | Not started |
+| 6 | `tsc` errors predating this work (versioned import specifiers, implicit `any`, `replaceAll` lib target) | Not started |
