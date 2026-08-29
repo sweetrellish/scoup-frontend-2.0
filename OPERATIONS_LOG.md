@@ -90,6 +90,62 @@ pre-existing (versioned import specifiers resolved by Vite aliases, implicit `an
 
 - **Status:** In repo, not yet built or deployed.
 
+### 2026-08-29 15:25 - Faculty review queue wired end to end
+
+- **Restore ID:** `FE-20260829-1525`
+- **Type:** Frontend source
+- **Artifact:** `~/scoup-backups/frontend/src.before-reviewqueue.20260829-152058.tar.gz`
+- **Files changed:** `src/components/admin/PendingApprovalsPage.tsx`, `src/utils/api.ts`,
+  `src/components/admin/FacultyManagementPage.tsx`,
+  `src/components/admin/AdminMessagesPage.tsx`,
+  `src/components/admin/DepartmentManagementPage.tsx`
+
+**The page called the right endpoints, but showed nothing worth deciding on.** Every one of the
+126 pending records rendered as a bare name - no department, no title, no indication of why it
+was pending - because the backend had cleared those fields when it demoted the records. The page
+also described them as *"faculty who have verified their institutional email"*, which is not what
+these are: they are SU-directory match candidates the importer refused to auto-verify.
+
+**Contract mismatch, present across the whole admin dashboard.** `primary_department` was typed
+as `{ id: number; name: string } | null`; the API has always returned a **plain string** (there
+is no Department model with ids). Four pages read `.name` off a string:
+
+| Page | Symptom |
+| --- | --- |
+| PendingApprovals | department badge silently never rendered |
+| FacultyManagement | fell through to `departments[0]`, masking the bug |
+| AdminMessages | same silent fallback |
+| DepartmentManagement | built a real department group keyed **`undefined`** |
+
+Fixed to `string` in all four, and `primary_school` added.
+
+**The queue now shows its evidence.** Each card renders `review_evidence` from the API:
+
+- a match-type badge - *First initial only*, *Ambiguous - multiple candidates*, *Not in the SU
+  directory* - colour-coded by how much doubt it carries
+- the plain-English reason, e.g. *the directory lists "Philip Anderson" but this record reads
+  "P... Anderson"*
+- the directory row that would be applied, with title, department and room resolved to a
+  building (`HS230F - Henson Science Hall`)
+- an expander listing every other directory row sharing the surname
+- ORCID (linked), paper and citation counts, and the papers currently attributed to the record,
+  so a reviewer can sanity-check the person against their publications
+- filter chips by match type, so the 115 single-candidate records can be worked separately from
+  the 11 genuinely ambiguous ones
+
+**Two approve actions, deliberately distinct.** *Confirm match* posts
+`apply_directory_match: true`, which writes the directory title, department, room, phone and
+school onto the record and marks it directory-verified; *Approve only* approves without
+asserting the directory identity. Records with no single candidate offer only plain approve, and
+the backend independently returns 400 if the flag is sent anyway - the UI cannot talk it into a
+guess.
+
+- **Verification:** `npx tsc --noEmit` reports no new errors (the one remaining,
+  `replaceAll` in FacultyManagementPage:236, is pre-existing - confirmed by re-running against a
+  stashed tree). Endpoint behaviour verified against the backend by curl; see the
+  2026-08-29 15:20 entry in the backend log.
+- **Status:** In repo, not yet built or deployed.
+
 ---
 
 ## Planned work
