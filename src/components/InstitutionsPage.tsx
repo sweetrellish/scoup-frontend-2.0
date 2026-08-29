@@ -60,7 +60,7 @@ export function InstitutionsPage() {
       </header>
 
       <div className="flex flex-wrap items-center gap-3 mb-4">
-        <div className="relative flex-1 min-w-[16rem] max-w-xl">
+        <div className="relative flex-1 max-w-2xl">
           <SearchIcon
             className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
             aria-hidden="true"
@@ -70,7 +70,7 @@ export function InstitutionsPage() {
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Search institutions"
             aria-label="Search institutions"
-            className="w-full pl-9 pr-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-[#8b0000]/30"
+            className="w-full pl-10 px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-[#8b0000]"
           />
         </div>
         <label className="flex items-center gap-2 text-sm text-gray-600">
@@ -119,18 +119,18 @@ export function InstitutionsPage() {
                   <Building className="w-4 h-4 text-gray-400 shrink-0" aria-hidden="true" />
                   <span className="font-medium text-gray-900">{institution.name}</span>
                   {institution.isHost && (
-                    <span className="text-[11px] font-semibold uppercase tracking-wide text-[#8b0000] bg-[#ffd100]/40 px-2 py-0.5 rounded-full">
+                    <span className="text-xs font-semibold uppercase tracking-wide text-[#8b0000] bg-[#ffd100] px-2 py-0.5 rounded-full">
                       Host institution
                     </span>
                   )}
-                  <span className="ml-auto text-sm text-gray-500 tabular-nums shrink-0">
+                  <span className="ml-auto text-sm text-gray-500 shrink-0">
                     {institution.mentions} {institution.mentions === 1 ? "mention" : "mentions"}
                   </span>
                 </div>
 
-                <div className="mt-2 h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                <div className="mt-2 h-2 bg-gray-100 rounded-full overflow-hidden">
                   <div
-                    className="h-full bg-[#8b0000]/60 rounded-full"
+                    className="h-full bg-[#8b0000] rounded-full"
                     style={{
                       width: `${maxMentions ? (institution.mentions / maxMentions) * 100 : 0}%`,
                     }}
@@ -152,7 +152,7 @@ export function InstitutionsPage() {
                       {institution.mergedFrom.length === 1 ? "" : "s"} folded into this entry
                     </button>
                     {openProvenance === institution.name && (
-                      <ul className="mt-2 text-xs text-gray-500 space-y-0.5 list-disc list-inside">
+                      <ul className="mt-2 text-xs text-gray-500 space-y-1 list-disc list-inside">
                         {institution.mergedFrom.map((raw) => (
                           <li key={raw}>{raw}</li>
                         ))}

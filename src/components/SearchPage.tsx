@@ -97,7 +97,7 @@ export function SearchPage() {
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Search papers by topic, title or keyword"
             aria-label="Search papers"
-            className="w-full pl-9 pr-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-[#8b0000]/30"
+            className="w-full pl-10 px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-[#8b0000]"
           />
         </div>
         <button
@@ -115,7 +115,7 @@ export function SearchPage() {
       </div>
 
       {showFilters && (
-        <div className="border border-gray-200 rounded-lg bg-white p-4 mb-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="border border-gray-200 rounded-lg bg-white p-4 mb-6 grid gap-4 md:grid-cols-3">
           <label className="text-sm">
             <span className="block text-gray-600 mb-1">Published from</span>
             <input
@@ -223,7 +223,7 @@ export function SearchPage() {
 
       {!loading && results.length > 0 && (
         <>
-          <div className="flex items-baseline justify-between mb-3">
+          <div className="flex items-center justify-between mb-3">
             <p className="text-sm text-gray-500">
               {results.length} {results.length === 1 ? "paper" : "papers"}
             </p>
@@ -235,7 +235,7 @@ export function SearchPage() {
               return (
                 <li key={paper.id} className="border border-gray-200 rounded-lg bg-white p-4">
                   <div className="flex items-start justify-between gap-4">
-                    <h2 className="font-medium text-gray-900 leading-snug">
+                    <h2 className="font-medium text-gray-900">
                       {href ? (
                         <a
                           href={href}
@@ -251,7 +251,7 @@ export function SearchPage() {
                       )}
                     </h2>
                     <span
-                      className="text-xs font-medium text-gray-600 tabular-nums shrink-0"
+                      className="text-xs font-medium text-gray-600 shrink-0"
                       title="Ranker confidence"
                     >
                       {Math.round(paper.confidence)}%
@@ -266,13 +266,13 @@ export function SearchPage() {
                   </p>
 
                   <div className="flex flex-wrap items-center gap-2 mt-2">
-                    <span className="text-xs text-gray-500 tabular-nums">
+                    <span className="text-xs text-gray-500">
                       {paper.citations} {paper.citations === 1 ? "citation" : "citations"}
                     </span>
                     {(paper.matchedOn || []).map((field) => (
                       <span
                         key={field}
-                        className="text-[11px] bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full"
+                        className="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full"
                         title="Field that matched the query"
                       >
                         matched {field}

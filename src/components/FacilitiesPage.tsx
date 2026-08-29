@@ -53,7 +53,7 @@ export function FacilitiesPage() {
       </header>
 
       {summary && (
-        <dl className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
+        <dl className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
           {[
             { label: "Buildings", value: summary.buildingsWithCodes },
             { label: "Building codes", value: summary.buildingCodes },
@@ -62,14 +62,14 @@ export function FacilitiesPage() {
           ].map((stat) => (
             <div key={stat.label} className="border border-gray-200 rounded-lg bg-white px-4 py-3">
               <dt className="text-xs text-gray-500">{stat.label}</dt>
-              <dd className="text-xl font-semibold text-gray-900 tabular-nums">{stat.value}</dd>
+              <dd className="text-xl font-semibold text-gray-900">{stat.value}</dd>
             </div>
           ))}
         </dl>
       )}
 
       <div className="flex flex-wrap items-center gap-3 mb-4">
-        <div className="relative flex-1 min-w-[16rem] max-w-xl">
+        <div className="relative flex-1 max-w-2xl">
           <SearchIcon
             className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
             aria-hidden="true"
@@ -79,7 +79,7 @@ export function FacilitiesPage() {
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Search by building, code or department"
             aria-label="Search facilities"
-            className="w-full pl-9 pr-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-[#8b0000]/30"
+            className="w-full pl-10 px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-[#8b0000]"
           />
         </div>
         <label className="flex items-center gap-2 text-sm text-gray-600">
@@ -137,13 +137,13 @@ function FacilityCard({ facility }: { facility: Facility }) {
             {facility.codes.map((code) => (
               <span
                 key={code}
-                className="text-[11px] font-mono bg-gray-100 text-gray-600 px-1.5 py-0.5 rounded"
+                className="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded"
               >
                 {code}
               </span>
             ))}
             {!facility.hasBuildingCode && (
-              <span className="text-[11px] text-gray-500 italic">no building code</span>
+              <span className="text-xs text-gray-500">no building code</span>
             )}
           </div>
 
@@ -166,8 +166,8 @@ function FacilityCard({ facility }: { facility: Facility }) {
         </div>
 
         {facility.facultyCount > 0 && (
-          <span className="flex items-center gap-1 text-sm text-gray-600 tabular-nums shrink-0">
-            <Users className="w-3.5 h-3.5" aria-hidden="true" />
+          <span className="flex items-center gap-1 text-sm text-gray-600 shrink-0">
+            <Users className="w-3 h-3" aria-hidden="true" />
             {facility.facultyCount}
           </span>
         )}

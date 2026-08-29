@@ -40,7 +40,7 @@ export function NoDataYetPage({
 
         <p className="text-sm text-gray-600 mt-3">{whyEmpty}</p>
 
-        <dl className="mt-5 space-y-4 text-sm">
+        <dl className="mt-6 space-y-4 text-sm">
           <div>
             <dt className="font-medium text-gray-700">What exists today</dt>
             <dd className="text-gray-600 mt-1">{whatExists}</dd>
@@ -57,7 +57,7 @@ export function NoDataYetPage({
           </div>
         </dl>
 
-        <p className="text-xs text-gray-400 mt-5">
+        <p className="text-xs text-gray-400 mt-6">
           This page shows nothing rather than sample data, so a count of zero here is a fact
           about the dataset, not a placeholder.
         </p>

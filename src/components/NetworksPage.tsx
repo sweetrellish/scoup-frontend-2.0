@@ -137,7 +137,7 @@ export function NetworksPage() {
         </p>
       </header>
 
-      <div className="relative mb-4 max-w-xl">
+      <div className="relative mb-4 max-w-2xl">
         <SearchIcon
           className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
           aria-hidden="true"
@@ -147,7 +147,7 @@ export function NetworksPage() {
           onChange={(e) => setQuery(e.target.value)}
           placeholder="Enter a topic, e.g. coastal ecology, data science"
           aria-label="Search the collaboration network"
-          className="w-full pl-9 pr-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-[#8b0000]/30"
+          className="w-full pl-10 px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-[#8b0000]"
         />
       </div>
 
@@ -165,7 +165,7 @@ export function NetworksPage() {
         </p>
       ) : (
         <>
-          <dl className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
+          <dl className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
             {[
               { label: "Researchers", value: data.colleagues.length },
               { label: "Departments", value: bridging },
@@ -180,7 +180,7 @@ export function NetworksPage() {
                 className="border border-gray-200 rounded-lg bg-white px-4 py-3"
               >
                 <dt className="text-xs text-gray-500">{stat.label}</dt>
-                <dd className="text-xl font-semibold text-gray-900 tabular-nums">{stat.value}</dd>
+                <dd className="text-xl font-semibold text-gray-900">{stat.value}</dd>
               </div>
             ))}
           </dl>
@@ -225,8 +225,8 @@ export function NetworksPage() {
                         </p>
                       )}
                     </div>
-                    <span className="flex items-center gap-1 text-sm text-gray-600 tabular-nums shrink-0">
-                      <Users className="w-3.5 h-3.5" aria-hidden="true" />
+                    <span className="flex items-center gap-1 text-sm text-gray-600 shrink-0">
+                      <Users className="w-3 h-3" aria-hidden="true" />
                       {cluster.members.length}
                     </span>
                   </div>
@@ -236,7 +236,7 @@ export function NetworksPage() {
                       {cluster.keywords.map((keyword) => (
                         <span
                           key={keyword}
-                          className="text-[11px] bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full"
+                          className="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full"
                         >
                           {keyword}
                         </span>
@@ -246,12 +246,12 @@ export function NetworksPage() {
 
                   <ul className="mt-3 space-y-1">
                     {cluster.members.slice(0, 4).map((member) => (
-                      <li key={member.id} className="text-sm text-gray-700 flex items-baseline gap-2">
+                      <li key={member.id} className="text-sm text-gray-700 flex items-center gap-2">
                         <span className="truncate">{member.name}</span>
                         {member.directoryVerified && (
-                          <span className="text-[10px] text-green-700 shrink-0">verified</span>
+                          <span className="text-xs text-green-700 shrink-0">verified</span>
                         )}
-                        <span className="ml-auto text-xs text-gray-400 tabular-nums shrink-0">
+                        <span className="ml-auto text-xs text-gray-400 shrink-0">
                           {member.articleCount} papers
                         </span>
                       </li>
@@ -284,7 +284,7 @@ export function NetworksPage() {
                         aria-hidden="true"
                       />
                       <div className="min-w-0">
-                        <p className="text-sm font-medium text-gray-900 leading-snug">
+                        <p className="text-sm font-medium text-gray-900">
                           {paper.title}
                         </p>
                         <p className="text-xs text-gray-500 mt-1">
@@ -298,7 +298,7 @@ export function NetworksPage() {
                           </p>
                         )}
                       </div>
-                      <span className="ml-auto text-xs text-gray-400 tabular-nums shrink-0">
+                      <span className="ml-auto text-xs text-gray-400 shrink-0">
                         {paper.citations} cited
                       </span>
                     </div>
