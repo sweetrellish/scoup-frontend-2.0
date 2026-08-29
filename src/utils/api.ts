@@ -288,6 +288,121 @@ export const patentsAPI = {
     apiCall(`/patents/${id}/`, { method: "DELETE" }),
 };
 
+export interface SearchPaper {
+  id: string;
+  title: string;
+  doi: string;
+  journal: string;
+  authors: string[];
+  year: number;
+  abstract: string;
+  link: string;
+  citations: number;
+  aiKeywords: string[];
+  matchedOn?: string[];
+  confidence: number;
+  semanticScore: number;
+}
+
+export interface SearchFilters {
+  year_min?: number;
+  year_max?: number;
+  journal?: string;
+  min_citations?: number;
+  has_abstract?: boolean;
+  sort?: "relevance" | "citations" | "year";
+}
+
+export interface SearchResponse {
+  query: string;
+  model: string;
+  count: number;
+  results: SearchPaper[];
+  filters: Record<string, string | number | boolean>;
+  detail?: string;
+}
+
+/**
+ * Server-side ranked search over the full paper corpus.
+ *
+ * Distinct from the home page search bar, which ranks a dataset downloaded to
+ * the browser via `/api/public/search-data/`. This hits the backend ranker and
+ * supports filters the client-side engine has no equivalent for.
+ */
+export const searchAPI = {
+  papers: async (
+    q: string,
+    filters: SearchFilters = {},
+    limit = 25,
+  ): Promise<SearchResponse> => {
+    const params = new URLSearchParams({ q, limit: String(limit) });
+    if (filters.year_min != null) params.set("year_min", String(filters.year_min));
+    if (filters.year_max != null) params.set("year_max", String(filters.year_max));
+    if (filters.journal) params.set("journal", filters.journal);
+    if (filters.min_citations != null) params.set("min_citations", String(filters.min_citations));
+    if (filters.has_abstract) params.set("has_abstract", "true");
+    if (filters.sort && filters.sort !== "relevance") params.set("sort", filters.sort);
+    return apiCall(`/search/?${params}`);
+  },
+};
+
+export interface Institution {
+  name: string;
+  mentions: number;
+  isHost: boolean;
+  mergedFrom: string[];
+}
+
+export interface InstitutionsResponse {
+  count: number;
+  total: number;
+  results: Institution[];
+  source: { derivedFrom: string; metric: string; cleaning: string };
+}
+
+export const institutionsAPI = {
+  list: async (params: { q?: string; excludeHost?: boolean; limit?: number } = {}):
+    Promise<InstitutionsResponse> => {
+    const query = new URLSearchParams();
+    if (params.q?.trim()) query.set("q", params.q.trim());
+    if (params.excludeHost) query.set("exclude_host", "true");
+    if (params.limit) query.set("limit", String(params.limit));
+    return apiCall(`/institutions/${query.toString() ? `?${query}` : ""}`);
+  },
+};
+
+export interface Facility {
+  name: string;
+  codes: string[];
+  facultyCount: number;
+  departments: string[];
+  schools: string[];
+  onFacilitiesPage: boolean;
+  hasBuildingCode: boolean;
+}
+
+export interface FacilitiesResponse {
+  count: number;
+  results: Facility[];
+  summary: {
+    buildingsWithCodes: number;
+    buildingCodes: number;
+    onFacilitiesPage: number;
+    occupiedByFaculty: number;
+    facultyPlaced: number;
+  };
+  source: { join: string; note: string };
+}
+
+export const facilitiesAPI = {
+  list: async (params: { q?: string; occupied?: boolean } = {}): Promise<FacilitiesResponse> => {
+    const query = new URLSearchParams();
+    if (params.q?.trim()) query.set("q", params.q.trim());
+    if (params.occupied) query.set("occupied", "true");
+    return apiCall(`/facilities/${query.toString() ? `?${query}` : ""}`);
+  },
+};
+
 export const networkAPI = {
   discovery: async ({ q = "", limit = 50 }: { q?: string; limit?: number } = {}) => {
     const params = new URLSearchParams();

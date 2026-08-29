@@ -12,6 +12,11 @@ import { AppShell } from "./components/AppShell";
 import { ExpertsPage } from "./components/ExpertsPage";
 import { CapabilitiesPage } from "./components/CapabilitiesPage";
 import { ComingSoonPage } from "./components/ComingSoonPage";
+import { NoDataYetPage } from "./components/NoDataYetPage";
+import { SearchPage } from "./components/SearchPage";
+import { NetworksPage } from "./components/NetworksPage";
+import { InstitutionsPage } from "./components/InstitutionsPage";
+import { FacilitiesPage } from "./components/FacilitiesPage";
 import { BrowseCategories } from "./components/BrowseCategories";
 import { Documentation } from "./components/Documentation";
 import { PrivacyPolicy } from "./components/PrivacyPolicy";
@@ -24,14 +29,14 @@ type UserRole = "admin" | "faculty" | null;
 const ROLE_STORAGE_KEY = "scoupUserRole";
 
 const SIDEBAR_PAGE_META: Record<string, { title: string; description: string; endpoint?: string }> = {
-  "/search": { title: "Search", description: "Unified search across papers, faculty and projects.", endpoint: "/api/search/" },
+  "/search": { title: "Search", description: "Ranked search across the full publication corpus, with filters and match explanations.", endpoint: "/api/search/" },
   "/expertise-map": { title: "Expertise Map", description: "Browse institutional research strengths, then drill into the experts behind each area.", endpoint: "/api/categories/" },
-  "/networks": { title: "Networks", description: "Collaboration networks across the institution.", endpoint: "/api/network/discovery/" },
+  "/networks": { title: "Networks", description: "How research on a topic connects across departments and schools.", endpoint: "/api/network/discovery/" },
   "/capabilities": { title: "Capabilities", description: "Representative capability areas grouped from the network\u2019s real research profiles. Search to find a capability, then see the experts behind it.", endpoint: "/api/categories/" },
   "/projects": { title: "Projects", description: "Funded and active research projects.", endpoint: "/api/projects/" },
   "/labs": { title: "Labs", description: "Research labs and groups." },
-  "/facilities": { title: "Facilities", description: "Shared instrumentation and facilities." },
-  "/institutions": { title: "Institutions", description: "Partner and peer institutions." },
+  "/facilities": { title: "Facilities", description: "Campus buildings and the departments housed in them.", endpoint: "/api/facilities/" },
+  "/institutions": { title: "Institutions", description: "Institutions appearing in the affiliations of papers in this corpus.", endpoint: "/api/institutions/" },
   "/network-intelligence": { title: "Network Intelligence", description: "Analytics across the verified network." },
   "/events": { title: "Events", description: "Research events and calls." },
   "/verified-network": { title: "Verified Network", description: "Directory-verified faculty." },
@@ -258,11 +263,59 @@ useEffect(() => {
           </AppShell>
         );
       case "/search":
+        return (
+          <AppShell currentPath={currentPath} onNavigate={handleNavigate} isAuthenticated={!!userRole}>
+            <SearchPage />
+          </AppShell>
+        );
       case "/networks":
-      case "/projects":
-      case "/labs":
-      case "/facilities":
+        return (
+          <AppShell currentPath={currentPath} onNavigate={handleNavigate} isAuthenticated={!!userRole}>
+            <NetworksPage />
+          </AppShell>
+        );
       case "/institutions":
+        return (
+          <AppShell currentPath={currentPath} onNavigate={handleNavigate} isAuthenticated={!!userRole}>
+            <InstitutionsPage />
+          </AppShell>
+        );
+      case "/facilities":
+        return (
+          <AppShell currentPath={currentPath} onNavigate={handleNavigate} isAuthenticated={!!userRole}>
+            <FacilitiesPage />
+          </AppShell>
+        );
+      case "/projects":
+        return (
+          <AppShell currentPath={currentPath} onNavigate={handleNavigate} isAuthenticated={!!userRole}>
+            <NoDataYetPage
+              title="Projects"
+              description="Funded and active research projects."
+              whyEmpty="No projects have been recorded. The Project table is empty, and nothing is invented to fill this page."
+              whatExists="A Project model and an authenticated API at /api/projects/, scoped so each faculty member manages their own projects from the faculty portal."
+              whatWouldFillIt={[
+                "Faculty adding projects through the faculty dashboard",
+                "An import from a grants or sponsored-programs system, which is not currently connected",
+              ]}
+            />
+          </AppShell>
+        );
+      case "/labs":
+        return (
+          <AppShell currentPath={currentPath} onNavigate={handleNavigate} isAuthenticated={!!userRole}>
+            <NoDataYetPage
+              title="Labs"
+              description="Research labs and groups."
+              whyEmpty="There is no data source for labs. The Salisbury University research pages are navigational and list no labs or centers, so there is nothing accurate to show."
+              whatExists="No model, endpoint or dataset. Facilities are tracked separately, by building, on the Facilities page."
+              whatWouldFillIt={[
+                "A maintained list of labs and research groups from the institution",
+                "Faculty declaring lab affiliation on their profile",
+              ]}
+            />
+          </AppShell>
+        );
       case "/network-intelligence":
       case "/events":
       case "/verified-network":
