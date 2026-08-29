@@ -11,7 +11,7 @@ interface FacultyRow {
   profile_visibility: boolean;
   article_count: number;
   photo: string | null;
-  primary_department: { id: number; name: string } | null;
+  primary_department: string;
   departments: string[];
 }
 
@@ -49,7 +49,7 @@ export function DepartmentManagementPage() {
 
     allFaculty.forEach(f => {
       const depts = f.primary_department
-        ? [f.primary_department.name, ...f.departments.filter(d => d !== f.primary_department?.name)]
+        ? [f.primary_department, ...f.departments.filter(d => d !== f.primary_department)]
         : f.departments.length > 0 ? f.departments : ["Unassigned"];
 
       depts.forEach(deptName => {

@@ -54,7 +54,7 @@ type FacultyRow = {
   name: string;
   email: string;
   institutional_email: string;
-  primary_department: { id: number; name: string } | null;
+  primary_department: string;
   departments: string[];
   is_approved: boolean;
   profile_visibility: boolean;
@@ -108,7 +108,7 @@ function formatDateTime(value: string) {
 }
 
 const departmentName = (f: FacultyRow) =>
-  f.primary_department?.name || f.departments?.[0] || "No department";
+  f.primary_department || f.departments?.[0] || "No department";
 
 // ─── Component ────────────────────────────────────────────────────────────────
 

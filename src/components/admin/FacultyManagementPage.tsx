@@ -44,7 +44,8 @@ interface FacultyRow {
   patent_count?: number;
   project_count?: number;
   photo: string | null;
-  primary_department: { id: number; name: string } | null;
+  primary_department: string;
+  primary_school: string;
   departments: string[];
   has_user: boolean;
   missing_data: boolean;
@@ -72,7 +73,7 @@ const needsReview = (faculty: FacultyRow) =>
   isPending(faculty) || (faculty.has_user && !faculty.institutional_email_verified);
 
 const departmentName = (faculty: FacultyRow) =>
-  faculty.primary_department?.name || faculty.departments?.[0] || "No department";
+  faculty.primary_department || faculty.departments?.[0] || "No department";
 
 const statusFor = (faculty: FacultyRow): "active" | "pending" | "inactive" => {
   if (isPending(faculty)) return "pending";

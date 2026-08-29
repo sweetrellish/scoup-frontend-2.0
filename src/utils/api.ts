@@ -421,6 +421,76 @@ export const contactAPI = {
   },
 };
 
+/** One SU-directory row offered as evidence for a pending faculty record. */
+export interface DirectoryCandidate {
+  first_name: string;
+  last_name: string;
+  title: string;
+  department: string;
+  room: string;
+  building: string;
+  phone_ext: string;
+}
+
+export type DirectoryMatchType =
+  | "exact"
+  | "initial"
+  | "ambiguous"
+  | "no_first_name"
+  | "unmatched"
+  | "no_directory";
+
+/**
+ * Why a faculty record is sitting in the review queue. Recomputed server-side
+ * from the cached SU directory, because the importer that demoted these records
+ * stored no reason at the time.
+ */
+export interface ReviewEvidence {
+  match_type: DirectoryMatchType;
+  reason: string;
+  candidates: DirectoryCandidate[];
+  best_match: DirectoryCandidate | null;
+  searched_for: { first_name: string; last_name: string; name: string };
+  signals: {
+    article_count: number;
+    total_citations: number;
+    orcid: string;
+    openalex_id: string;
+    has_login: boolean;
+    directory_verified: boolean;
+  };
+  recent_papers?: string[];
+}
+
+export interface AdminFaculty {
+  id: number;
+  name: string;
+  email: string;
+  institutional_email: string;
+  institutional_email_verified: boolean;
+  has_user: boolean;
+  /** Department name, or "" - a plain string, not an object. */
+  primary_department: string;
+  primary_school: string;
+  departments: string[];
+  title: string;
+  room: string;
+  phone: string;
+  orcid: string;
+  openalex_id: string;
+  is_approved: boolean;
+  profile_visibility: boolean;
+  review_status: "pending" | "approved" | "rejected";
+  review_note: string;
+  directory_verified: boolean;
+  article_count: number;
+  total_citations: number;
+  created_at: string;
+  updated_at: string;
+  review_evidence?: ReviewEvidence;
+  applied_fields?: string[];
+}
+
 export const adminAPI = {
   me: async () => apiCall("/admin/me/"),
   updateMe: async (data: { first_name?: string; last_name?: string; email?: string }) =>
@@ -434,13 +504,22 @@ export const adminAPI = {
     if (params.department) q.set("department", params.department);
     return apiCall(`/admin/faculty/${q.toString() ? `?${q}` : ""}`);
   },
-  getPendingFaculty: async () => apiCall("/admin/faculty/?pending=true"),
+  getPendingFaculty: async (): Promise<AdminFaculty[]> =>
+    apiCall("/admin/faculty/?status=pending"),
   updateFaculty: async (id: number, data: Record<string, any>) =>
     apiCall(`/admin/faculty/${id}/`, { method: "PATCH", body: JSON.stringify(data) }),
   deleteFaculty: async (id: number) =>
     apiCall(`/admin/faculty/${id}/`, { method: "DELETE" }),
-  approveFaculty: async (id: number) =>
-    apiCall(`/admin/faculty/${id}/approve/`, { method: "POST" }),
+  /**
+   * Approve a faculty record. `applyDirectoryMatch` also writes the confirmed SU
+   * directory row (title, department, room, phone, school) onto the record and
+   * marks it directory-verified; the backend rejects it when no single row matches.
+   */
+  approveFaculty: async (id: number, applyDirectoryMatch = false): Promise<AdminFaculty> =>
+    apiCall(`/admin/faculty/${id}/approve/`, {
+      method: "POST",
+      body: JSON.stringify({ apply_directory_match: applyDirectoryMatch }),
+    }),
   rejectFaculty: async (id: number, reason?: string) =>
     apiCall(`/admin/faculty/${id}/reject/`, {
       method: "POST",
