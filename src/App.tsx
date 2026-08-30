@@ -11,7 +11,6 @@ import { ResetPassword } from "./components/ResetPassword";
 import { AppShell } from "./components/AppShell";
 import { ExpertsPage } from "./components/ExpertsPage";
 import { CapabilitiesPage } from "./components/CapabilitiesPage";
-import { ComingSoonPage } from "./components/ComingSoonPage";
 import { NoDataYetPage } from "./components/NoDataYetPage";
 import { SearchPage } from "./components/SearchPage";
 import { NetworksPage } from "./components/NetworksPage";
@@ -33,15 +32,10 @@ const SIDEBAR_PAGE_META: Record<string, { title: string; description: string; en
   "/search": { title: "Search", description: "Ranked search across the full publication corpus, with filters and match explanations.", endpoint: "/api/search/" },
   "/expertise-map": { title: "Expertise Map", description: "Browse institutional research strengths, then drill into the experts behind each area.", endpoint: "/api/categories/" },
   "/networks": { title: "Networks", description: "How research on a topic connects across departments and schools.", endpoint: "/api/network/discovery/" },
-  "/capabilities": { title: "Capabilities", description: "Representative capability areas grouped from the network\u2019s real research profiles. Search to find a capability, then see the experts behind it.", endpoint: "/api/categories/" },
   "/projects": { title: "Projects", description: "Funded and active research projects.", endpoint: "/api/projects/" },
   "/labs": { title: "Labs", description: "Research labs and groups." },
   "/facilities": { title: "Facilities", description: "Campus buildings and the departments housed in them.", endpoint: "/api/facilities/" },
   "/institutions": { title: "Institutions", description: "Institutions appearing in the affiliations of papers in this corpus.", endpoint: "/api/institutions/" },
-  "/network-intelligence": { title: "Network Intelligence", description: "Analytics across the verified network." },
-  "/events": { title: "Events", description: "Research events and calls." },
-  "/verified-network": { title: "Verified Network", description: "Directory-verified faculty." },
-  "/my-network": { title: "My Network", description: "Your saved contacts and introductions.", endpoint: "/api/faculty/inquiries/" },
 };
 
 const normalizePath = (path: string) => {
@@ -253,7 +247,6 @@ useEffect(() => {
             <ExpertsPage onNavigate={handleNavigate} />
           </AppShell>
         );
-      case "/capabilities":
       case "/expertise-map":
         return (
           <AppShell currentPath={currentPath} onNavigate={handleNavigate} isAuthenticated={!!userRole}>
@@ -315,19 +308,6 @@ useEffect(() => {
                 "A maintained list of labs and research groups from the institution",
                 "Faculty declaring lab affiliation on their profile",
               ]}
-            />
-          </AppShell>
-        );
-      case "/network-intelligence":
-      case "/events":
-      case "/verified-network":
-      case "/my-network":
-        return (
-          <AppShell currentPath={currentPath} onNavigate={handleNavigate} isAuthenticated={!!userRole}>
-            <ComingSoonPage
-              title={SIDEBAR_PAGE_META[currentPath]?.title ?? "Page"}
-              description={SIDEBAR_PAGE_META[currentPath]?.description ?? ""}
-              endpoint={SIDEBAR_PAGE_META[currentPath]?.endpoint}
             />
           </AppShell>
         );

@@ -3,15 +3,10 @@ import {
   Map,
   Network,
   Users,
-  Boxes,
   FolderOpen,
   FlaskConical,
   Building2,
   Landmark,
-  BarChart3,
-  CalendarDays,
-  BadgeCheck,
-  UserCircle,
   Shield,
   Lock,
 } from "lucide-react";
@@ -35,7 +30,6 @@ const DISCOVER_ITEMS: NavItem[] = [
   { label: "Expertise Map", path: "/expertise-map", icon: Map },
   { label: "Networks", path: "/networks", icon: Network },
   { label: "Experts", path: "/experts", icon: Users },
-  { label: "Capabilities", path: "/capabilities", icon: Boxes },
   { label: "Projects", path: "/projects", icon: FolderOpen },
   { label: "Labs", path: "/labs", icon: FlaskConical },
   { label: "Facilities", path: "/facilities", icon: Building2 },
@@ -43,10 +37,6 @@ const DISCOVER_ITEMS: NavItem[] = [
 ];
 
 const MEMBER_ITEMS: NavItem[] = [
-  { label: "Network Intelligence", path: "/network-intelligence", icon: BarChart3 },
-  { label: "Events", path: "/events", icon: CalendarDays },
-  { label: "Verified Network", path: "/verified-network", icon: BadgeCheck },
-  { label: "My Network", path: "/my-network", icon: UserCircle },
   { label: "Admin", path: "/admin-dashboard", icon: Shield },
 ];
 
