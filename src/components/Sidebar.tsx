@@ -85,41 +85,28 @@ export function Sidebar({
 
   return (
     <header className="fixed inset-x-0 top-0 z-[100] isolate border-b border-[#5f0000] bg-white shadow-md shadow-black/10">
-      <div className="flex h-20">
+      <div className="relative flex h-20 overflow-hidden">
         <a
           href="https://www.salisbury.edu"
           target="_blank"
           rel="noopener noreferrer"
-          className="flex w-56 shrink-0 items-center bg-white px-5 py-3 text-left"
+          className="relative z-20 flex w-64 shrink-0 items-center bg-white px-7 py-3 text-left"
         >
           <img
             src={salisburyLogo}
             alt={institution}
-            className="h-10 w-auto max-w-full object-contain"
+            className="h-11 w-auto max-w-full object-contain"
           />
         </a>
 
-        <div className="relative h-full w-28 shrink-0 overflow-visible bg-white" aria-hidden="true">
-          <svg
-            viewBox="0 0 112 80"
-            preserveAspectRatio="none"
-            className="absolute inset-0 h-full w-full"
-          >
-            <path
-              d="M112 0H58C30 0 12 11 12 27v53h100Z"
-              fill="#8b0000"
-            />
-          </svg>
-          <div className="absolute -left-16 top-2 h-16 w-52 overflow-visible">
-            <img
-              src={seagullWing}
-              alt=""
-              className="h-full w-full max-w-none object-contain"
-            />
-          </div>
-        </div>
+        <img
+          src={seagullWing}
+          alt=""
+          className="pointer-events-none absolute left-44 top-0 z-30 h-20 w-80 max-w-none object-contain"
+          aria-hidden="true"
+        />
 
-        <div className="flex min-w-0 flex-1 rounded-tl-[2rem] bg-[#8b0000]">
+        <div className="relative z-10 flex min-w-0 flex-1 rounded-tl-[2rem] bg-[#8b0000] pl-8">
           <div className="flex min-w-0 flex-1 items-stretch justify-between gap-x-2 pr-3">
             <nav className="flex min-w-0 flex-1 flex-nowrap items-stretch overflow-hidden pr-2" aria-label="Main">
               {DISCOVER_ITEMS.map((item) => renderItem(item, false))}
