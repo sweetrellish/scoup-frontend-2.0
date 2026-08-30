@@ -12,7 +12,7 @@ import {
 import type { CSSProperties } from "react";
 
 import salisburyLogo from "../assets/images/Salisbury_University_logo.png";
-import suMark from "../assets/images/su-logo.png";
+import seagullWing from "../assets/images/seagull-wing.png";
 
 export interface SidebarProps {
   currentPath: string;
@@ -99,23 +99,22 @@ export function Sidebar({
           />
         </a>
 
-        <div className="relative h-full w-32 shrink-0 overflow-visible bg-white" aria-hidden="true">
+        <div className="relative h-full w-36 shrink-0 overflow-visible bg-white" aria-hidden="true">
           <svg
-            viewBox="0 0 128 80"
+            viewBox="0 0 144 80"
             preserveAspectRatio="none"
             className="absolute inset-0 h-full w-full"
           >
             <path
-              d="M128 0H62C34 0 13 11 13 27v53h115Z"
+              d="M144 0H74C42 0 18 11 18 27v53h126Z"
               fill="#8b0000"
             />
           </svg>
-          <div className="absolute -left-12 -top-10 h-28 w-52 overflow-hidden">
+          <div className="absolute -left-16 top-1 h-20 w-56 overflow-visible">
             <img
-              src={suMark}
+              src={seagullWing}
               alt=""
-              className="absolute h-64 w-64 max-w-none object-contain"
-              style={{ left: "-36px", top: "-26px" }}
+              className="h-full w-full max-w-none object-contain"
             />
           </div>
         </div>
