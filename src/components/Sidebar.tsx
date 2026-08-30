@@ -8,7 +8,10 @@ import {
   Building2,
   Landmark,
   Lock,
+  Menu,
+  X,
 } from "lucide-react";
+import { useState } from "react";
 import type { CSSProperties } from "react";
 
 import salisburyLogo from "../assets/images/Salisbury_University_logo.png";
@@ -45,6 +48,7 @@ export function Sidebar({
   expertCount,
   institution = "Salisbury University",
 }: SidebarProps) {
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const isActive = (path: string) =>
     currentPath === path || currentPath.startsWith(`${path}/`);
 
@@ -59,11 +63,14 @@ export function Sidebar({
       <button
         key={item.path}
         type="button"
-        onClick={() => (locked ? onNavigate("/faculty-login") : onNavigate(item.path))}
+        onClick={() => {
+          setIsMobileMenuOpen(false);
+          locked ? onNavigate("/faculty-login") : onNavigate(item.path);
+        }}
         aria-current={active ? "page" : undefined}
         style={itemStyle}
         className={[
-          "relative flex h-full items-center justify-center gap-1.5 px-2 py-2 text-sm font-semibold uppercase tracking-wide transition-colors xl:px-2.5 2xl:gap-2 2xl:px-3",
+          "relative flex h-full items-center justify-center gap-1.5 px-1.5 py-2 text-xs font-semibold uppercase tracking-wide transition-colors xl:gap-2 xl:px-2 xl:text-sm 2xl:px-3",
           active
             ? "after:absolute after:bottom-0 after:left-2 after:right-2 after:h-1 after:bg-[#ffc425] xl:after:left-2.5 xl:after:right-2.5"
             : locked
@@ -71,7 +78,7 @@ export function Sidebar({
               : "hover:bg-[#710000]",
         ].join(" ")}
       >
-        <Icon className="hidden h-4 w-4 shrink-0 2xl:block" aria-hidden="true" />
+        <Icon className="h-4 w-4 shrink-0" aria-hidden="true" />
         <span className="whitespace-nowrap">{item.label}</span>
         {locked && <Lock className="w-3 h-3 shrink-0" aria-hidden="true" />}
       </button>
@@ -85,13 +92,13 @@ export function Sidebar({
           href="https://www.salisbury.edu"
           target="_blank"
           rel="noopener noreferrer"
-          className="relative z-20 flex w-56 shrink-0 items-center justify-center bg-white px-5 py-3 text-left"
+          className="relative z-20 flex w-48 shrink-0 items-center justify-center bg-white px-4 py-3 text-left lg:w-52 xl:w-56"
         >
           <img
             src={salisburyLogo}
             alt={institution}
-            className="h-11 w-auto object-contain"
-            style={{ maxWidth: "12.25rem" }}
+            className="h-9 w-auto object-contain lg:h-10"
+            style={{ maxWidth: "11rem" }}
           />
         </a>
 
@@ -100,16 +107,19 @@ export function Sidebar({
             className="pointer-events-none absolute inset-y-0 left-0 z-20 w-16 bg-gradient-to-r from-white via-[#fff4d0]/80 to-transparent"
             aria-hidden="true"
           />
-          <div className="flex min-w-0 flex-1 items-stretch justify-between gap-x-2 pr-8">
-            <nav className="relative z-40 flex min-w-0 flex-1 flex-nowrap items-stretch justify-start overflow-hidden pr-2" aria-label="Main">
+          <div className="flex min-w-0 flex-1 items-stretch justify-between gap-x-2 pr-5 lg:pr-7">
+            <nav className="relative z-40 hidden min-w-0 flex-1 flex-nowrap items-stretch justify-start overflow-hidden pr-2 lg:flex" aria-label="Main">
               {DISCOVER_ITEMS.map((item) => renderItem(item, false))}
             </nav>
 
-            <div className="relative z-40 flex min-w-[9.25rem] shrink-0 flex-col items-center justify-center gap-1 py-2">
+            <div className="relative z-40 hidden min-w-[8.75rem] shrink-0 flex-col items-center justify-center gap-1 py-2 lg:flex xl:min-w-[9.25rem]">
               {!isAuthenticated && (
                 <button
                   type="button"
-                  onClick={() => onNavigate("/faculty-login")}
+                  onClick={() => {
+                    setIsMobileMenuOpen(false);
+                    onNavigate("/faculty-login");
+                  }}
                   style={{ borderColor: "#ffc425", color: "#ffc425" }}
                   className="rounded-sm border px-2.5 py-1.5 text-xs font-semibold uppercase tracking-wide transition-colors hover:bg-[#ffc425] hover:text-[#710000]"
                 >
@@ -119,7 +129,10 @@ export function Sidebar({
               {isAuthenticated && (
                 <button
                   type="button"
-                  onClick={() => onNavigate("/faculty-dashboard")}
+                  onClick={() => {
+                    setIsMobileMenuOpen(false);
+                    onNavigate("/faculty-dashboard");
+                  }}
                   style={{ borderColor: "#ffc425", color: "#ffc425" }}
                   className="rounded-sm border px-2.5 py-1.5 text-xs font-semibold uppercase tracking-wide transition-colors hover:bg-[#ffc425] hover:text-[#710000]"
                 >
@@ -138,9 +151,47 @@ export function Sidebar({
               </div>
             </div>
 
+            <button
+              type="button"
+              onClick={() => setIsMobileMenuOpen((open) => !open)}
+              aria-expanded={isMobileMenuOpen}
+              aria-label="Open navigation menu"
+              style={{ borderColor: "#ffc425", color: "#ffc425" }}
+              className="relative z-40 my-auto ml-auto inline-flex h-10 w-10 items-center justify-center rounded-sm border transition-colors hover:bg-[#710000] lg:hidden"
+            >
+              {isMobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+            </button>
+
           </div>
         </div>
       </div>
+      {isMobileMenuOpen && (
+        <div className="lg:hidden">
+          <nav className="grid grid-cols-2 gap-1 border-t border-[#ffc425]/25 bg-[#8b0000] p-3" aria-label="Mobile main">
+            {DISCOVER_ITEMS.map((item) => renderItem(item, false))}
+          </nav>
+          <div className="border-t border-[#ffc425]/25 bg-[#710000] px-3 py-3">
+            <button
+              type="button"
+              onClick={() => {
+                setIsMobileMenuOpen(false);
+                onNavigate(isAuthenticated ? "/faculty-dashboard" : "/faculty-login");
+              }}
+              style={{ borderColor: "#ffc425", color: "#ffc425" }}
+              className="w-full rounded-sm border px-3 py-2 text-xs font-semibold uppercase tracking-wide transition-colors hover:bg-[#ffc425] hover:text-[#710000]"
+            >
+              {isAuthenticated ? "Faculty Portal" : "Faculty Sign In"}
+            </button>
+            <div className="mt-2 flex items-center justify-center gap-2 text-xs font-medium" style={{ color: "rgba(255,255,255,0.88)" }}>
+              <span className="h-2 w-2 rounded-full bg-[#ffc425]" aria-hidden="true" />
+              <span>
+                Network live
+                {typeof expertCount === "number" ? ` · ${expertCount.toLocaleString()} experts` : ""}
+              </span>
+            </div>
+          </div>
+        </div>
+      )}
     </header>
   );
 }
