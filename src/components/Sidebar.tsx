@@ -102,7 +102,7 @@ export function Sidebar({
         <img
           src={seagullWing}
           alt=""
-          className="pointer-events-none absolute left-48 top-0 z-30 h-20 w-80 max-w-none object-contain"
+          className="pointer-events-none absolute left-36 top-1 z-30 h-16 w-64 max-w-none rotate-[-7deg] object-contain opacity-95"
           aria-hidden="true"
         />
 
