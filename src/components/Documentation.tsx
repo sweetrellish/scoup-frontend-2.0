@@ -66,6 +66,15 @@ export function Documentation({ onNavigate }: Props) {
         <section className="max-w-4xl mx-auto px-6 pt-10 pb-2">
           <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-4">Project Repositories</h2>
           <div className="grid sm:grid-cols-2 gap-4">
+            <a href="https://github.com/Salisbury-University/2024Fall-COSC425-AcademicMetrics" target="_blank" rel="noopener noreferrer"
+              className="group flex items-center gap-4 p-4 rounded-xl border border-gray-200 hover:border-[#8b0000]/30 hover:shadow-sm transition-all bg-white">
+              <Github className="w-5 h-5 text-gray-500 group-hover:text-[#8b0000] shrink-0 transition-colors" />
+              <div className="min-w-0">
+                <p className="text-sm font-semibold text-gray-900 group-hover:text-[#8b0000] transition-colors">Academic Metrics (v1)</p>
+                <p className="text-xs text-gray-400 truncate">Original COSC425 research metrics project</p>
+              </div>
+              <ExternalLink className="w-3.5 h-3.5 text-gray-300 group-hover:text-[#8b0000] shrink-0 ml-auto transition-colors" />
+            </a>
             {frontendRepoUrl && (
               <a href={frontendRepoUrl} target="_blank" rel="noopener noreferrer"
                 className="group flex items-center gap-4 p-4 rounded-xl border border-gray-200 hover:border-[#8b0000]/30 hover:shadow-sm transition-all bg-white">
@@ -88,15 +97,6 @@ export function Documentation({ onNavigate }: Props) {
                 <ExternalLink className="w-3.5 h-3.5 text-gray-300 group-hover:text-[#8b0000] shrink-0 ml-auto transition-colors" />
               </a>
             )}
-            <a href="https://github.com/Salisbury-University/2024Fall-COSC425-AcademicMetrics" target="_blank" rel="noopener noreferrer"
-              className="group flex items-center gap-4 p-4 rounded-xl border border-gray-200 hover:border-[#8b0000]/30 hover:shadow-sm transition-all bg-white">
-              <Github className="w-5 h-5 text-gray-500 group-hover:text-[#8b0000] shrink-0 transition-colors" />
-              <div className="min-w-0">
-                <p className="text-sm font-semibold text-gray-900 group-hover:text-[#8b0000] transition-colors">Academic Metrics (v1)</p>
-                <p className="text-xs text-gray-400 truncate">Original COSC425 research metrics project</p>
-              </div>
-              <ExternalLink className="w-3.5 h-3.5 text-gray-300 group-hover:text-[#8b0000] shrink-0 ml-auto transition-colors" />
-            </a>
             {docsUrl && (
               <a href={docsUrl} target="_blank" rel="noopener noreferrer"
                 className="group flex items-center gap-4 p-4 rounded-xl border border-gray-200 hover:border-[#8b0000]/30 hover:shadow-sm transition-all bg-white">
