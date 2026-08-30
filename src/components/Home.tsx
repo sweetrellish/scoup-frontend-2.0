@@ -464,8 +464,11 @@ export function Home({ onNavigate, showNavbar = true }: HomeProps) {
                   Salisbury University
                 </span>
               </div>
-              <h1 className="text-5xl md:text-6xl lg:text-7xl font-light text-[#7a0000] tracking-tight">
-                Discover. <span className="text-[#8b0000]">Connect.</span> Collaborate.
+              <h1
+                className="text-5xl md:text-6xl lg:text-7xl font-light tracking-tight"
+                style={{ color: "#7a0000" }}
+              >
+                Discover. <span style={{ color: "#8b0000" }}>Connect.</span> Collaborate.
               </h1>
               <p className="text-lg md:text-xl text-gray-600 max-w-2xl mx-auto font-light leading-relaxed">
                 AI-powered platform connecting Salisbury University's expertise with real-world impact.

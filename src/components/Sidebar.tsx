@@ -63,9 +63,9 @@ export function Sidebar({
         aria-current={active ? "page" : undefined}
         style={itemStyle}
         className={[
-          "relative flex h-full items-center gap-2 px-3 py-2 text-sm font-semibold uppercase tracking-wide transition-colors",
+          "relative flex h-full items-center gap-1.5 px-2.5 py-2 text-xs font-semibold uppercase tracking-wide transition-colors xl:gap-2 xl:px-3 xl:text-sm",
           active
-            ? "after:absolute after:bottom-0 after:left-3 after:right-3 after:h-1 after:bg-[#ffc425]"
+            ? "after:absolute after:bottom-0 after:left-2.5 after:right-2.5 after:h-1 after:bg-[#ffc425] xl:after:left-3 xl:after:right-3"
             : locked
               ? "hover:bg-white/5"
               : "hover:bg-[#710000]",
@@ -105,12 +105,13 @@ export function Sidebar({
             <nav className="flex min-w-0 flex-1 flex-wrap items-stretch pr-4" aria-label="Main">
               {DISCOVER_ITEMS.map((item) => renderItem(item, false))}
             </nav>
-            <div className="flex min-w-[13rem] flex-col items-end justify-center gap-1 py-2">
+            <div className="flex min-w-[12rem] flex-col items-end justify-center gap-1 py-2">
               {!isAuthenticated && (
                 <button
                   type="button"
                   onClick={() => onNavigate("/faculty-login")}
-                  className="rounded-sm border border-[#ffc425] px-4 py-1.5 text-sm font-semibold uppercase tracking-wide text-[#ffc425] transition-colors hover:bg-[#ffc425] hover:text-[#710000]"
+                  style={{ borderColor: "#ffc425", color: "#ffc425" }}
+                  className="rounded-sm border px-3 py-1.5 text-xs font-semibold uppercase tracking-wide transition-colors hover:bg-[#ffc425] hover:text-[#710000] xl:px-4 xl:text-sm"
                 >
                   Faculty Sign In
                 </button>
@@ -119,7 +120,8 @@ export function Sidebar({
                 <button
                   type="button"
                   onClick={() => onNavigate("/faculty-dashboard")}
-                  className="rounded-sm border border-[#ffc425] px-4 py-1.5 text-sm font-semibold uppercase tracking-wide text-[#ffc425] transition-colors hover:bg-[#ffc425] hover:text-[#710000]"
+                  style={{ borderColor: "#ffc425", color: "#ffc425" }}
+                  className="rounded-sm border px-3 py-1.5 text-xs font-semibold uppercase tracking-wide transition-colors hover:bg-[#ffc425] hover:text-[#710000] xl:px-4 xl:text-sm"
                 >
                   Faculty Portal
                 </button>
