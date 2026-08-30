@@ -491,6 +491,105 @@ was written and **caught as inert - the base class does not exist in the stylesh
   To push: `ssh-add ~/.ssh/id_ed25519 && cd ~/scoup-frontend-2.0 && git push`. The backend
   repo uses HTTPS and pushed cleanly.
 
+### 2026-08-30 07:50 - Expertise Map rebuilt: bubble cluster, ranked areas, expert drill-down
+
+- **Restore ID:** `FE-20260830-0750`
+- **Type:** Frontend source
+- **Files changed:** `src/components/CapabilitiesPage.tsx` (rewritten), `src/utils/api.ts`
+- **Files added:** `src/components/ExternalInquiryDialog.tsx` (extracted, not new behaviour)
+- **File touched:** `src/components/BrowseCategories.tsx` (dialog moved out, unused imports dropped)
+- **Requires** the backend change logged in `~/scoup-backend/OPERATIONS_LOG.md` at
+  2026-08-30 07:45 to be **correct**, but not to be **safe** - see "Degradation" below.
+
+`/expertise-map` was a flat grid of category cards. It is now the three-part structure of the
+reference product (<https://interlora.vercel.app/expertise-map>), adapted to the data this
+platform actually has.
+
+**1. Bubble cluster.** One circle per research area that has at least one SU expert, diameter
+linear in expert count (104 px at the small end, 208 px at Sociology's 41), pastel gradient
+rotating through five fills, name and "N experts" centred, staggered vertical offsets rather
+than a grid, over a faint horizontal-rule background. The twelve largest show by default with
+a "Show all 42" toggle. Gradients, circle geometry, the rule pattern and the bars are written
+as **inline styles**, not utility classes - `src/index.css` is precompiled and would silently
+drop them (see the 2026-08-29 16:40 entry).
+
+**2. The same areas as a ranked list,** ordered by the score its bar shows: the mean
+`_default_prominence` of that area's experts, 0-100. Each row carries a coloured dot, the
+percentage, a gradient bar and "N experts - M papers - C citations". The reference says
+"N experts - M projects"; **the Project table is empty**, so papers and citations are shown
+instead of a zero.
+
+**3. Drill-down panel** replacing the cluster: coloured dot, area name, a close button, a
+one-line description, subtopic chips, then the experts.
+
+**What was built differently on purpose, and why.**
+
+| Reference | Here | Reason |
+| --- | --- | --- |
+| Five metric bars: Acad / Prac / Pub / Collab / Net | Three: papers, citations, citations per paper | `Faculty.academic|practice|publication` are populated on **86 of 1,719** records and hold raw counts, not 0-100 scores; there is no collaboration or network field at all. The three shown are populated for effectively every listed record. |
+| "OVERALL" score | **Prominence**, from the backend's `_default_prominence` | Real signals only - directory verification 45, department 10, title 5, papers up to 20, citations up to 20. Reused, not reinvented, so the Networks page and this page rank the same person identically (Chao Miao is 91 on both). The composition is in the number's tooltip. |
+| Generated "Why recommended" prose | "Listed under *Sociology, general* and 2 more sub-areas - 7 of their 32 papers are keyworded to sociology" | Assembled from `matched_categories` and `paper_ids`, the fields that actually put the person in this area. The papers clause is omitted when the count is zero rather than padded. |
+| Green "Available" status dot | Omitted; a **Directory verified** badge where the record really is | There is no availability signal in the data. Every faculty row the endpoint returns is already `profile_visibility=True`, so a dot driven off it would be a light that is always on. |
+| One-line area description | The area's real counts: "41 SU experts across 18 departments - 997 papers - 15,413 citations - 15.46 citations per paper" | Categories have no description field. Prose would have been invented. |
+| Subtopic chips | `mid_level_categories`, kept only where a listed expert actually carries one, each with its count | A chip that filtered to nobody would be a promise the data cannot keep. Areas with none show "No sub-areas are recorded under this area in the taxonomy" - Computer science has none, and says so. |
+| Bookmark | localStorage toggle, tooltipped *"Saved in this browser only (not stored on the server)"* | Client-only preference, so no fabricated server state. |
+| "Request intro" | The existing `POST /api/network/inquire/` flow | No second mechanism: the dialog `BrowseCategories` already used was **moved** into `ExternalInquiryDialog.tsx` and both import it. Behaviour unchanged, verified on `/browse` too. |
+| "View ->" | `/faculty/:id` through the existing `FacultyLink` | Only rendered when `profile_visibility` is set, so it can never land on a 404. |
+
+**Degradation, verified rather than assumed.** The new API fields are optional in the TypeScript
+types and guarded at every use, so the page renders against a backend that predates them.
+Driven against the **live** site: 12 bubbles, 46 ranked rows, no prominence text or bars, no
+console errors, no failed requests. Live also shows the bug the backend change fixes - the
+Sociology bubble reads 53 experts and its panel honestly reports "No SU expert is mapped to
+this area", because today's deployed `category_detail` returns none for a top-level slug.
+
+- **Verification - the production bundle against a real backend, not mocked.** `dist/` served
+  on :4173 with SPA fallback, `/api` proxied (GET **and** POST) to a Django dev server on
+  :9123 running the new backend over a **throwaway copy** of the database; a second server on
+  :4174 proxied to live for the degradation test. Same-origin, so production is reproduced and
+  `scoupdb/settings.py` was not touched. Playwright over the system Chromium.
+
+| Check | Result |
+| --- | --- |
+| bubbles | 12 rendered, 9 distinct diameters 104-208 px, 5 distinct gradients, 12 distinct y offsets (staggered) |
+| bubble -> **Sociology** (41 experts) | 41 cards, 4 chips, top card Chao Miao - prominence 91, 32 papers, 1,108 citations, 34.6 per paper |
+| bubble -> **Computer science** (11) | 11 cards, chips correctly absent, top card Jing Quan - 91, 49 papers, 1,102 citations, "38 of their 49 papers are keyworded to computer science" |
+| bubble -> **Physiology** (11, 47 papers) | 11 cards, 2 chips, top card Vinita Agarwal - 83, 20 papers, 323 citations |
+| subtopic chip | "Physiology, general" 11 -> 8 experts; "All experts" restores 11 |
+| active chip computed style | `rgb(139, 0, 0)` background, white text - not the invisible-chip failure mode |
+| ranked list | 42 rows, percentages monotonically descending |
+| bookmark | `aria-pressed` false -> true, `localStorage["scoup.expertiseMap.bookmarks"]` = `[902]`, still pressed after a reload |
+| **View ->** | `/faculty/652`, h1 "Jing Quan", title and department byte-matching `/api/faculty/652/public/` |
+| **Request intro** | dialog names the right person; submit -> `POST /network/inquire/` **201** `{"id":7,"status":"new"}`, success state shown |
+| search "ecology" | 1 bubble, Ecology, 9 experts; "Show all" -> 42 |
+| `/browse` inquiry dialog after the extraction | opens, targets "Asif Shakur - Physics" - no regression |
+| 14-route smoke test | every route renders its correct `h1`; **zero** console errors and zero failed requests |
+
+**Stylesheet discipline.** Every class in both new files was checked against `src/index.css`
+by escaped selector before committing. One inert class was caught and replaced: **`px-5` does
+not exist** (`p-5` does). Both files come back clean; the misses the audit still reports are
+all in `BrowseCategories.tsx` and predate this work.
+
+`npm run build` succeeds (2,328 modules). `npx tsc --noEmit` reports **no** errors in
+`CapabilitiesPage.tsx`, `ExternalInquiryDialog.tsx` or `api.ts`; the ones it prints are
+pre-existing (the `BrowseCategories` implicit-any simply moved from line 875 to 755 when the
+dialog was lifted out). `node_modules` was empty at the start of this session and was
+reinstalled with `npm ci`.
+
+- **Status:** In repo, built successfully, **not deployed** - `/var/www` left untouched by
+  instruction.
+- **Push:** commit `c528f2a` is **local-only**. This repo's remote is SSH and
+  `~/.ssh/id_ed25519` is passphrase-protected with nothing loaded in the agent
+  (`ssh-add -l` -> "The agent has no identities"), so `git push` blocks on the passphrase
+  prompt - same cause as the 2026-08-29 18:50 entry. To push:
+  `ssh-add ~/.ssh/id_ed25519 && cd ~/scoup-frontend-2.0 && git push`. The backend repo uses
+  HTTPS and pushed cleanly (`0cc01d0`).
+- **Note on repo state.** Commits `4262cc2` and `7dea223` were made in this repository by
+  another actor while this work was in progress; `7dea223` swept up the in-progress
+  `ExternalInquiryDialog.tsx` extraction and the first version of the `api.ts` types. Nothing
+  was lost, but this branch was not exclusively held during the change. The same happened in
+  the backend repo (`13f50a2`, `fd364c3`).
+
 ---
 
 ## Planned work
@@ -504,7 +603,7 @@ was written and **caught as inert - the base class does not exist in the stylesh
 | 5 | Bundle is 1.15 MB; needs code-splitting | Not started |
 | 6 | `tsc` errors predating this work (versioned import specifiers, implicit `any`, `replaceAll` lib target) | Not started |
 | 7 | **`src/index.css` is precompiled and nothing regenerates it** - unknown Tailwind classes are silently inert. Add `tailwindcss` as a build dependency | Not started - see 2026-08-29 16:40 |
-| 8 | `ExpertsPage.tsx` **and `CapabilitiesPage.tsx`** use inert classes (`pl-9`, `pr-3`, `max-w-xl`, `text-[11px]`, `focus:ring-[#8b0000]/30`) | Not started - see 2026-08-29 18:35 |
+| 8 | `ExpertsPage.tsx` **and `CapabilitiesPage.tsx`** use inert classes (`pl-9`, `pr-3`, `max-w-xl`, `text-[11px]`, `focus:ring-[#8b0000]/30`) | **CapabilitiesPage done** 2026-08-30 - rewritten and class-audited clean. `ExpertsPage.tsx` still degraded |
 | 9 | React "unique key prop" warning in `AdminOverviewPage` | Not started |
 | 10 | Home-page search results cannot link to `/faculty/<id>`: `/api/public/search-data/` returns `faculty_id` slugs, not the pk. Needs the pk added to that payload (backend + deploy) | **Done** (2026-08-29 18:50) - `profileId` wired through; faculty results also made reachable, see that entry |
 | 11 | `/docs` calls `GET /api/contact/settings/`, which does not exist - a 404 on every load | **Done** (2026-08-29 18:55) - backend built; see the backend log. Both `/contact` and `/docs` now load with zero API 4xx |

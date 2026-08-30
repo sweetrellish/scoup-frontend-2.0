@@ -697,13 +697,17 @@ export interface TopLevelCategory {
   slug: string;
   article_count: number;
   faculty_count: number;
-  /** Citations across this area's papers. */
-  total_citations: number;
+  /**
+   * Citations across this area's papers. Optional because a backend older than
+   * 2026-08-30 does not send it, and the UI must degrade rather than crash.
+   */
+  total_citations?: number;
   /**
    * Mean of `_default_prominence` over this area's SU experts (0-100) — the same
    * score `/network/discovery/` ranks people by. 0 when no expert is mapped here.
+   * Optional for the same reason as `total_citations`.
    */
-  expert_prominence: number;
+  expert_prominence?: number;
   mid_level_categories: MidLevelCategory[];
 }
 
@@ -732,11 +736,12 @@ export interface CategoryFaculty {
   paper_ids: number[];
   is_approved: boolean;
   profile_visibility: boolean;
-  directory_verified: boolean;
+  /** Optional: added 2026-08-30; absent from older backend builds. */
+  directory_verified?: boolean;
   /** Exact taxonomy strings on this person that place them in this category. */
-  matched_categories: string[];
+  matched_categories?: string[];
   /** 0-100, from the backend's shared `_default_prominence`. */
-  prominence: number;
+  prominence?: number;
   email: string;
 }
 
