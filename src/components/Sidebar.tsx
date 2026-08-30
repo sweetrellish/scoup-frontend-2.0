@@ -70,9 +70,9 @@ export function Sidebar({
         aria-current={active ? "page" : undefined}
         style={itemStyle}
         className={[
-          "relative flex h-full items-center justify-center gap-1 px-1.5 py-2 text-xs font-semibold uppercase tracking-wide transition-colors xl:gap-1.5 xl:px-2 2xl:gap-2 2xl:px-3 2xl:text-sm",
+          "relative flex h-full items-center justify-center gap-1 px-1.5 py-2 text-xs font-semibold uppercase tracking-wide transition-colors md:gap-2 md:px-3 md:text-sm xl:px-4",
           active
-            ? "after:absolute after:bottom-0 after:left-2 after:right-2 after:h-1 after:bg-[#ffc425] xl:after:left-2.5 xl:after:right-2.5"
+            ? "after:absolute after:bottom-0 after:left-2 after:right-2 after:h-1 after:bg-[#ffc425] md:after:left-3 md:after:right-3"
             : locked
               ? "hover:bg-white/5"
               : "hover:bg-[#710000]",
