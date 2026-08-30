@@ -12,7 +12,7 @@ import {
 import type { CSSProperties } from "react";
 
 import salisburyLogo from "../assets/images/Salisbury_University_logo.png";
-import seagullWing from "../assets/images/seagull-wing.png";
+import seagullWing from "../assets/images/seagull-wing-transparent.png";
 
 export interface SidebarProps {
   currentPath: string;
@@ -68,9 +68,9 @@ export function Sidebar({
         aria-current={active ? "page" : undefined}
         style={itemStyle}
         className={[
-          "relative flex h-full items-center gap-1 px-1.5 py-2 text-xs font-semibold uppercase tracking-wide transition-colors xl:px-2",
+          "relative flex h-full items-center gap-1.5 px-2.5 py-2 text-sm font-semibold uppercase tracking-wide transition-colors xl:gap-2 xl:px-3",
           active
-            ? "after:absolute after:bottom-0 after:left-1.5 after:right-1.5 after:h-1 after:bg-[#ffc425] xl:after:left-2 xl:after:right-2"
+            ? "after:absolute after:bottom-0 after:left-2.5 after:right-2.5 after:h-1 after:bg-[#ffc425] xl:after:left-3 xl:after:right-3"
             : locked
               ? "hover:bg-white/5"
               : "hover:bg-[#710000]",
@@ -102,7 +102,7 @@ export function Sidebar({
         <img
           src={seagullWing}
           alt=""
-          className="pointer-events-none absolute left-44 top-0 z-30 h-20 w-80 max-w-none object-contain"
+          className="pointer-events-none absolute left-48 top-0 z-30 h-20 w-80 max-w-none object-contain"
           aria-hidden="true"
         />
 
