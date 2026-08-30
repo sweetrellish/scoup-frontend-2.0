@@ -8,6 +8,7 @@ import { StrategicInsightsPage } from "./admin/StrategicInsightsPage";
 import { AdminProfilePage } from "./admin/AdminProfilePage";
 import { ContactPageEditor } from "./admin/ContactPageEditor";
 import { PendingApprovalsPage } from "./admin/PendingApprovalsPage";
+import { PendingPapersPage } from "./admin/PendingPapersPage";
 import { InquiriesPage } from "./admin/InquiriesPage";
 import { AdminMessagesPage } from "./admin/AdminMessagesPage";
 import { Button } from "./ui/button";
@@ -15,7 +16,7 @@ import { adminAPI } from "../utils/api";
 import {
   LogOut, LayoutDashboard, Users,
   UserCircle, Phone, ShieldCheck, ChevronLeft,
-  ChevronRight, MessageSquare, Inbox, ExternalLink,
+  ChevronRight, MessageSquare, Inbox, ExternalLink, FileClock,
 } from "lucide-react";
 
 interface AdminDashboardProps {
@@ -23,7 +24,7 @@ interface AdminDashboardProps {
   onNavigate: (path: string) => void;
 }
 
-type Tab = "overview" | "faculty" | "pending" | "departments" | "analytics" | "insights" | "contact" | "inquiries" | "messages" | "profile";
+type Tab = "overview" | "faculty" | "pending" | "pending-papers" | "departments" | "analytics" | "insights" | "contact" | "inquiries" | "messages" | "profile";
 
 export function AdminDashboard({ onLogout, onNavigate }: AdminDashboardProps) {
   const [showLogoutDialog, setShowLogoutDialog] = useState(false);
@@ -31,6 +32,7 @@ export function AdminDashboard({ onLogout, onNavigate }: AdminDashboardProps) {
   const [activeTab, setActiveTab] = useState<Tab>("overview");
   const [adminName, setAdminName] = useState("");
   const [pendingCount, setPendingCount] = useState(0);
+  const [pendingPaperCount, setPendingPaperCount] = useState(0);
 
   // Auto-logout when any API call detects an expired session
   useEffect(() => {
@@ -49,6 +51,12 @@ export function AdminDashboard({ onLogout, onNavigate }: AdminDashboardProps) {
       const list = Array.isArray(data) ? data : data?.results || [];
       setPendingCount(list.length);
     }).catch(() => {});
+
+    // The paper queue is thousands of rows, so the badge reads `count` off a
+    // one-row page rather than downloading the queue to measure it.
+    adminAPI.getPapers({ status: "pending", limit: 1 }).then((page) => {
+      setPendingPaperCount(page.count || 0);
+    }).catch(() => {});
   }, []);
 
   const renderContent = () => {
@@ -56,6 +64,7 @@ export function AdminDashboard({ onLogout, onNavigate }: AdminDashboardProps) {
       case "overview":    return <AdminOverviewPage onNavigate={setActiveTab} />;
       case "faculty":     return <FacultyManagementPage />;
       case "pending":     return <PendingApprovalsPage />;
+      case "pending-papers": return <PendingPapersPage />;
       case "departments": return <DepartmentManagementPage />;
       case "analytics":   return <AdminAnalyticsPage />;
       case "insights":    return <StrategicInsightsPage />;
@@ -118,6 +127,7 @@ export function AdminDashboard({ onLogout, onNavigate }: AdminDashboardProps) {
           <NavBtn tab="overview"    icon={LayoutDashboard} label="Overview"           />
           <NavBtn tab="faculty"     icon={Users}           label="Faculty Management" />
           <NavBtn tab="pending"     icon={ShieldCheck}     label="Pending Approvals"  badge={pendingCount} />
+          <NavBtn tab="pending-papers" icon={FileClock}   label="Pending Papers"     badge={pendingPaperCount} />
           <NavBtn tab="inquiries"   icon={MessageSquare}   label="Inquiries"          />
           <NavBtn tab="messages"    icon={Inbox}           label="Messages"           />
           <NavBtn tab="contact"     icon={Phone}           label="Contact & Links"    />

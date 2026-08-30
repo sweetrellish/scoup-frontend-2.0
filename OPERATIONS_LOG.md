@@ -590,6 +590,119 @@ reinstalled with `npm ci`.
   was lost, but this branch was not exclusively held during the change. The same happened in
   the backend repo (`13f50a2`, `fd364c3`).
 
+### 2026-08-30 08:45 - Pending Papers review queue (admin)
+
+- **Restore ID:** `FE-20260830-0845`
+- **Type:** Frontend source
+- **Artifact:** `~/scoup-backups/frontend/src.before-pending-papers.20260830-081432.tar.gz`
+- **File added:** `src/components/admin/PendingPapersPage.tsx`
+- **Files changed:** `src/utils/api.ts` (types + 4 methods), `src/components/AdminDashboard.tsx`
+  (tab, route, sidebar entry, badge)
+
+The 5,982 papers purged on 2026-08-30 for unverifiable SU authorship were restored as
+`Paper.review_status='pending'` - hidden from every public endpoint - so a person decides
+each one rather than the purge being silently undone or silently kept. This is the screen
+that decision is made on. It is an **admin tab**, reached from the admin sidebar next to
+Pending Approvals; no new top-level app route was added.
+
+**Mirrors `PendingApprovalsPage` (faculty) deliberately** - same card, same badge row, same
+green Approve / outlined red Reject pair, same inline "reason for rejection" input, same
+filter-chip row, same empty and loading states, same `max-w-4xl` column. A reviewer who has
+worked the faculty queue does not have to learn a second interaction model. Fields are the
+paper's: title (linking to `url`, falling back to `https://doi.org/<doi>`), journal, DOI,
+year, citations, keyword count.
+
+**The evidence shown per row - and one thing that had to be fixed to show it honestly.**
+The task called for showing that a paper has zero linked SU faculty, plus its keywords. The
+`faculty_members` field the endpoint returns is **not** that signal: it is a denormalised
+list of author *name strings* from the source record. All 5,982 pending papers have a
+non-empty `faculty_members` and **zero** rows in the `authors` M2M, so a page reading it as
+a link count would have printed *"1 linked SU faculty"* on every row of a queue whose entire
+premise is that none are linked. The backend now also returns `linked_faculty` from the real
+M2M (backend commit `e91111d`, logged there, **not deployed**), and the row shows:
+
+| Block | Content |
+| --- | --- |
+| **Linked SU faculty** | "None. No Salisbury University faculty profile is joined to this paper, and its institutional affiliation could not be confirmed against the SU employee directory." |
+| **Author names on the source record** | The `faculty_members` strings, captioned "Free text from the source metadata - none of these matched an SU faculty profile" |
+| **Keywords** | Every keyword as a chip, so the subject matter can be judged at a glance; if there are none the row says so instead of rendering an empty strip |
+| **Queue note** | The paper's own `review_note` ("Restored from 2026-08-30 purge; unverifiable SU authorship, held for admin review") - provenance, not editorial |
+| **Abstract** | Behind a Show/Hide toggle; the server truncates to 500 chars and the UI appends an ellipsis when it hit that ceiling |
+
+**Degradation.** `linked_faculty` is optional. Against a backend without it (live, today) the
+badge reads "Link status not reported" and the block says no claim is made either way,
+rather than the page inferring a link count it was not given.
+
+**Volume decisions, since this queue is 5,982 rows and the faculty queue was 126.**
+
+- Server-side title search (`?search=`), debounced 400 ms.
+- The endpoint caps at 200 rows, so the page says so in plain text: *"Showing the 200 most
+  recent of 5,982 pending papers"* - a silent cap would read as a queue that is nearly done.
+- **Bulk selection was added, which the faculty page does not have.** Per-row checkbox, a
+  "Select all N shown" toggle, and Approve N / Reject N against `POST /admin/papers/bulk-action/`.
+  There is deliberately **no "approve everything"**: selection covers only rows on screen, the
+  count is written into the button face, and bulk reject requires a reason first. Restoring
+  these as pending was a decision that 5,982 papers should not change state in one click, and
+  the UI does not offer a way to undo that decision in one click either.
+- Sidebar badge reads `count` off a `limit=1` request rather than downloading the queue to
+  measure it.
+
+- **Verification - the production bundle against a real backend, not mocked.** `dist/` served
+  on :4173 with SPA fallback, `/api` proxied (GET **and** POST) to a Django dev server on
+  :9123 running the new backend over a **throwaway copy** of the live database. Same-origin,
+  so production is reproduced. Playwright over the system Chromium. The endpoints are
+  superuser-only as of backend `cb5a546`, so a throwaway superuser was created in the copy;
+  the live database was snapshotted first (`~/scoup-backups/varwww-db.sqlite3.pre-paperreview-uitest.20260830-081959`)
+  and confirmed unchanged at 3,255 approved / 5,982 pending after every run.
+
+| Check | Result |
+| --- | --- |
+| sidebar | "Pending Papers" sits directly under "Pending Approvals", badge **99+** (5,982); Pending Approvals still **86** |
+| queue loads | `GET /admin/papers/?status=pending&limit=200` **200**, 200 rows rendered |
+| cap disclosed | "Showing the 200 most recent of 5,982 pending papers" |
+| filter chips | All (200) - No SU faculty profile linked (200) - No keywords (2); the "linked" chip correctly absent, since no pending paper has one |
+| **approve** | `POST /admin/papers/9326/approve/` **200**, `review_status: "approved"`; row disappears, count 200 -> 199, notice shown |
+| **reject** | `POST /admin/papers/9324/reject/` **200**, `review_status: "rejected"`, `review_note: "UI test: not Salisbury University research"`; row disappears, 199 -> 198 |
+| server agrees, not just local state | Refresh re-fetches: neither title returns, header now reads "of 5,980" |
+| approve really is public again | `GET /api/search/?q=ankle+foot+prosthesis+kinematic+decoupling` -> **1** result, the approved paper. Before approval the public search returned it not at all |
+| reject really stays hidden | `GET /api/search/?q=leadless+pacemaker+current+of+injury` -> **0** results |
+| admin stats | `content` -> `papers 3256 / papers_pending 5978 / papers_rejected 3` |
+| bulk reject | 2 rows ticked -> `POST /admin/papers/bulk-action/` **200** `{"updated":2,"action":"reject"}`; both rows gone |
+| select-all / Clear | "Select all 3 shown" -> "3 selected" -> buttons read "Approve 3" / "Reject 3" -> Clear restores |
+| title search | "ankle" -> 3 rows server-side; "pacemaker" -> 2 |
+| "No keywords" chip | 2 rows, both showing the "0 keywords" badge |
+| abstract toggle | Show -> Hide, abstract renders |
+| console errors across every step | **none**; every `/api/` response 200 |
+
+**Stylesheet discipline.** Every class in the new file was checked against `src/index.css`
+by unescaped selector before committing. Two inert classes were caught and replaced:
+**`pr-3` and `top-3` do not exist** in the stylesheet. The search icon was re-done with the
+`absolute left-3 top-1/2 -translate-y-1/2` pattern `FacultyManagementPage` already uses (all
+present), and the input's right padding moved to an inline style. Final audit: **110 classes
+used, 0 missing.**
+
+`npm run build` succeeds (`index-sOphrFEf.js`, 1.18 MB), built with `env -u VITE_API_BASE_URL`
+and re-checked for `onrender` (**0** occurrences) per `INCIDENT-20260829-1749`.
+`npx tsc --noEmit` reports **no** errors in `PendingPapersPage.tsx` or `api.ts`. The two it
+prints for `AdminDashboard.tsx` (`onNavigate={setActiveTab}`, TS2322) are **pre-existing** -
+confirmed by re-running `tsc` against a stashed tree, which reports the same two.
+
+- **Status:** In repo, built successfully, **not deployed** - `/var/www` left untouched by
+  instruction. Fully usable against the live backend today; the "Linked SU faculty" evidence
+  block needs backend `e91111d` deployed to show a verdict rather than "not reported".
+- **Push:** commit `f82e1b1` is **local-only**. This repo's remote is SSH
+  (`git@github.com:sweetrellish/scoup-frontend-2.0.git`) and `~/.ssh/id_ed25519` is
+  passphrase-protected with nothing loaded in the agent (`ssh-add -l` -> "The agent has no
+  identities"), so `git push` cannot authenticate - same cause as the 2026-08-30 07:50 entry.
+  Pushed with `BatchMode=yes` so it failed fast rather than hanging on the prompt. To push:
+  `ssh-add ~/.ssh/id_ed25519 && cd ~/scoup-frontend-2.0 && git push`. The backend repo uses
+  HTTPS and pushed cleanly (`e91111d`, `d03ff37`).
+- **Note on repo state.** `README.md` and `docs/current-implementation-playbook.md` /
+  `docs/documentation-index.md` were changed in this repository by another actor during this
+  work. They were **left out** of commit `f82e1b1`, which contains only the four files listed
+  above.
+
+
 ---
 
 ## Planned work
@@ -607,4 +720,5 @@ reinstalled with `npm ci`.
 | 9 | React "unique key prop" warning in `AdminOverviewPage` | Not started |
 | 10 | Home-page search results cannot link to `/faculty/<id>`: `/api/public/search-data/` returns `faculty_id` slugs, not the pk. Needs the pk added to that payload (backend + deploy) | **Done** (2026-08-29 18:50) - `profileId` wired through; faculty results also made reachable, see that entry |
 | 11 | `/docs` calls `GET /api/contact/settings/`, which does not exist - a 404 on every load | **Done** (2026-08-29 18:55) - backend built; see the backend log. Both `/contact` and `/docs` now load with zero API 4xx |
+| 13 | Bulk approve/reject on Pending Papers acts only on rows on screen (max 200); working 5,982 papers is many passes | Low - deliberate, see the 2026-08-30 08:45 entry |
 | 12 | Uploaded photos (contact team **and** faculty) are stored but unreachable - nginx has no `location /media/`, so `/media/...` returns `index.html`. Backend open item #21 | Not started - needs a root nginx change |

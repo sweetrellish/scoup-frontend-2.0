@@ -610,6 +610,45 @@ export interface AdminFaculty {
   applied_fields?: string[];
 }
 
+/** An SU Faculty profile actually joined to a paper (the `authors` M2M). */
+export interface LinkedFaculty {
+  id: number;
+  name: string;
+  department: string;
+}
+
+/**
+ * A paper in the admin review queue.
+ *
+ * `faculty_members` is a denormalised list of **author name strings** from the
+ * source record — it is not evidence of an SU affiliation, and every one of the
+ * papers restored from the 2026-08-30 purge has a non-empty one. `linked_faculty`
+ * is the real signal: the SU Faculty profiles joined to the paper, which is what
+ * the purge tested. It is optional because a backend predating that field simply
+ * omits it, and the UI must not invent a link count it was not given.
+ */
+export interface AdminPaper {
+  id: number;
+  doi: string;
+  title: string;
+  journal: string;
+  /** Truncated to 500 characters server-side. */
+  abstract: string;
+  year: number | null;
+  citations: number;
+  keywords: string[];
+  faculty_members: string[];
+  linked_faculty?: LinkedFaculty[];
+  review_status: "pending" | "approved" | "rejected";
+  review_note: string;
+  url: string;
+}
+
+export interface AdminPaperPage {
+  count: number;
+  results: AdminPaper[];
+}
+
 export const adminAPI = {
   me: async () => apiCall("/admin/me/"),
   updateMe: async (data: { first_name?: string; last_name?: string; email?: string }) =>
@@ -646,6 +685,34 @@ export const adminAPI = {
     }),
   bulkFacultyAction: async (action: "approve" | "reject", ids: number[], reason?: string) =>
     apiCall("/admin/faculty/bulk-action/", {
+      method: "POST",
+      body: JSON.stringify({ action, ids, reason: reason || "" }),
+    }),
+
+  // Paper review queue — the 5,982 papers restored from the 2026-08-30 purge.
+  // `count` is the size of the whole filtered queue, not of `results`.
+  getPapers: async (
+    params: { status?: "pending" | "approved" | "rejected"; search?: string; limit?: number } = {},
+  ): Promise<AdminPaperPage> => {
+    const q = new URLSearchParams();
+    q.set("status", params.status || "pending");
+    if (params.search) q.set("search", params.search);
+    q.set("limit", String(params.limit ?? 200));
+    return apiCall(`/admin/papers/?${q}`);
+  },
+  approvePaper: async (id: number): Promise<AdminPaper> =>
+    apiCall(`/admin/papers/${id}/approve/`, { method: "POST", body: JSON.stringify({}) }),
+  rejectPaper: async (id: number, reason?: string): Promise<AdminPaper> =>
+    apiCall(`/admin/papers/${id}/reject/`, {
+      method: "POST",
+      body: JSON.stringify({ reason: reason || "" }),
+    }),
+  bulkPaperAction: async (
+    action: "approve" | "reject",
+    ids: number[],
+    reason?: string,
+  ): Promise<{ updated: number; action: string }> =>
+    apiCall("/admin/papers/bulk-action/", {
       method: "POST",
       body: JSON.stringify({ action, ids, reason: reason || "" }),
     }),
