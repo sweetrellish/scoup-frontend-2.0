@@ -38,6 +38,11 @@ const DISCOVER_ITEMS: NavItem[] = [
   { label: "Institutions", path: "/institutions", icon: Landmark },
 ];
 
+const COMPACT_LABELS: Record<string, string> = {
+  "Expertise Map": "Map",
+  Institutions: "Inst.",
+};
+
 export function Sidebar({
   currentPath,
   onNavigate,
@@ -63,7 +68,7 @@ export function Sidebar({
         aria-current={active ? "page" : undefined}
         style={itemStyle}
         className={[
-          "relative flex h-full items-center gap-1.5 px-2.5 py-2 text-xs font-semibold uppercase tracking-wide transition-colors xl:gap-2 xl:px-3 xl:text-sm",
+          "relative flex h-full items-center gap-1 px-2 py-2 text-xs font-semibold uppercase tracking-wide transition-colors xl:gap-1.5 xl:px-2.5",
           active
             ? "after:absolute after:bottom-0 after:left-2.5 after:right-2.5 after:h-1 after:bg-[#ffc425] xl:after:left-3 xl:after:right-3"
             : locked
@@ -72,7 +77,7 @@ export function Sidebar({
         ].join(" ")}
       >
         <Icon className="h-4 w-4 shrink-0" aria-hidden="true" />
-        <span className="whitespace-nowrap">{item.label}</span>
+        <span className="whitespace-nowrap">{COMPACT_LABELS[item.label] ?? item.label}</span>
         {locked && <Lock className="w-3 h-3 shrink-0" aria-hidden="true" />}
       </button>
     );
@@ -94,21 +99,21 @@ export function Sidebar({
           />
         </a>
 
-        <div className="relative h-full w-28 shrink-0 bg-white" aria-hidden="true">
+        <div className="relative h-full w-20 shrink-0 bg-white" aria-hidden="true">
           <svg
-            viewBox="0 0 112 80"
+            viewBox="0 0 80 80"
             preserveAspectRatio="none"
             className="absolute inset-0 h-full w-full"
           >
             <path
-              d="M112 0H42C20 0 7 10 7 24v56h105Z"
+              d="M80 0H34C17 0 6 10 6 23v57h74Z"
               fill="#8b0000"
             />
             <path
-              d="M8 65C30 43 45 41 57 47C68 53 72 44 77 29C82 14 91 8 104 4"
+              d="M7 65C23 47 36 42 47 47C57 52 58 43 63 30C67 16 70 9 76 5"
               fill="none"
               stroke="#ffa726"
-              strokeWidth="10"
+              strokeWidth="8"
               strokeLinecap="round"
               strokeLinejoin="round"
             />
@@ -117,16 +122,16 @@ export function Sidebar({
 
         <div className="flex min-w-0 flex-1 rounded-tl-[2rem] bg-[#8b0000]">
           <div className="flex min-w-0 flex-1 items-stretch justify-between gap-x-3 pr-4">
-            <nav className="flex min-w-0 flex-1 flex-nowrap items-stretch overflow-x-auto overflow-y-hidden pr-4" aria-label="Main">
+            <nav className="flex min-w-0 flex-1 flex-nowrap items-stretch overflow-hidden pr-2" aria-label="Main">
               {DISCOVER_ITEMS.map((item) => renderItem(item, false))}
             </nav>
-            <div className="flex min-w-[12rem] shrink-0 flex-col items-end justify-center gap-1 py-2">
+            <div className="flex min-w-[10.5rem] shrink-0 flex-col items-end justify-center gap-1 py-2">
               {!isAuthenticated && (
                 <button
                   type="button"
                   onClick={() => onNavigate("/faculty-login")}
                   style={{ borderColor: "#ffc425", color: "#ffc425" }}
-                  className="rounded-sm border px-3 py-1.5 text-xs font-semibold uppercase tracking-wide transition-colors hover:bg-[#ffc425] hover:text-[#710000] xl:px-4 xl:text-sm"
+                  className="rounded-sm border px-3 py-1.5 text-xs font-semibold uppercase tracking-wide transition-colors hover:bg-[#ffc425] hover:text-[#710000]"
                 >
                   Faculty Sign In
                 </button>
@@ -136,7 +141,7 @@ export function Sidebar({
                   type="button"
                   onClick={() => onNavigate("/faculty-dashboard")}
                   style={{ borderColor: "#ffc425", color: "#ffc425" }}
-                  className="rounded-sm border px-3 py-1.5 text-xs font-semibold uppercase tracking-wide transition-colors hover:bg-[#ffc425] hover:text-[#710000] xl:px-4 xl:text-sm"
+                  className="rounded-sm border px-3 py-1.5 text-xs font-semibold uppercase tracking-wide transition-colors hover:bg-[#ffc425] hover:text-[#710000]"
                 >
                   Faculty Portal
                 </button>
