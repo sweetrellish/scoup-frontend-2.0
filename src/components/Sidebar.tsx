@@ -39,10 +39,6 @@ const DISCOVER_ITEMS: NavItem[] = [
   { label: "Institutions", path: "/institutions", icon: Landmark },
 ];
 
-const COMPACT_LABELS: Record<string, string> = {
-  "Expertise Map": "Map",
-};
-
 export function Sidebar({
   currentPath,
   onNavigate,
@@ -77,7 +73,7 @@ export function Sidebar({
         ].join(" ")}
       >
         <Icon className="h-4 w-4 shrink-0" aria-hidden="true" />
-        <span className="whitespace-nowrap">{COMPACT_LABELS[item.label] ?? item.label}</span>
+        <span className="whitespace-nowrap">{item.label}</span>
         {locked && <Lock className="w-3 h-3 shrink-0" aria-hidden="true" />}
       </button>
     );
@@ -102,16 +98,17 @@ export function Sidebar({
         <img
           src={seagullWing}
           alt=""
-          className="pointer-events-none absolute left-36 top-1 z-30 h-16 w-64 max-w-none rotate-[-7deg] object-contain opacity-95"
+          className="pointer-events-none absolute z-30 max-w-none object-contain opacity-95"
+          style={{ left: "4.5rem", top: "-0.35rem", width: "32rem", height: "6rem", transform: "rotate(-5deg)" }}
           aria-hidden="true"
         />
 
         <div className="relative z-10 flex min-w-0 flex-1 rounded-tl-[2rem] bg-[#8b0000] pl-8">
           <div className="flex min-w-0 flex-1 items-stretch justify-between gap-x-2 pr-3">
-            <nav className="flex min-w-0 flex-1 flex-nowrap items-stretch overflow-hidden pr-2" aria-label="Main">
+            <nav className="relative z-40 flex min-w-0 flex-1 flex-nowrap items-stretch overflow-hidden pr-2" aria-label="Main">
               {DISCOVER_ITEMS.map((item) => renderItem(item, false))}
             </nav>
-            <div className="flex min-w-[8.75rem] shrink-0 flex-col items-end justify-center gap-1 py-2">
+            <div className="relative z-40 flex min-w-[8.75rem] shrink-0 flex-col items-end justify-center gap-1 py-2">
               {!isAuthenticated && (
                 <button
                   type="button"
