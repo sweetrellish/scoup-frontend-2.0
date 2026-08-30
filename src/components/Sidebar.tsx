@@ -90,7 +90,8 @@ export function Sidebar({
           <img
             src={salisburyLogo}
             alt={institution}
-            className="h-11 w-auto max-w-full object-contain"
+            className="h-10 w-auto object-contain"
+            style={{ maxWidth: "13.5rem" }}
           />
         </a>
 
