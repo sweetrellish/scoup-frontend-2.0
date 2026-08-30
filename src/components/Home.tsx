@@ -63,11 +63,12 @@ import { getDepartmentAffiliations } from "../utils/datasetNormalization";
 
 interface HomeProps {
   onNavigate: (path: string) => void;
+  showNavbar?: boolean;
 }
 
 const DEPARTMENT_CHART_LIMIT = 8;
 
-export function Home({ onNavigate }: HomeProps) {
+export function Home({ onNavigate, showNavbar = true }: HomeProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
   const [hasSearched, setHasSearched] = useState(false);
@@ -308,7 +309,7 @@ export function Home({ onNavigate }: HomeProps) {
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
       {/* Header */}
-      <Navbar onNavigate={onNavigate} currentPath="/" />
+      {showNavbar && <Navbar onNavigate={onNavigate} currentPath="/" />}
 
       {hasSearched ? (
         // Search Results View

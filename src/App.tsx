@@ -197,7 +197,11 @@ useEffect(() => {
 
     switch (currentPath) {
       case "/":
-        return <Home onNavigate={handleNavigate} />;
+        return (
+          <AppShell currentPath={currentPath} onNavigate={handleNavigate} isAuthenticated={!!userRole}>
+            <Home onNavigate={handleNavigate} showNavbar={false} />
+          </AppShell>
+        );
       case "/about":
         return <About onNavigate={handleNavigate} />;
       case "/contact":

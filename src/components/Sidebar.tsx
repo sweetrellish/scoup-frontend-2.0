@@ -26,7 +26,7 @@ interface NavItem {
 }
 
 const DISCOVER_ITEMS: NavItem[] = [
-  { label: "Search", path: "/search", icon: Search },
+  { label: "Search", path: "/", icon: Search },
   { label: "Expertise Map", path: "/expertise-map", icon: Map },
   { label: "Networks", path: "/networks", icon: Network },
   { label: "Experts", path: "/experts", icon: Users },
