@@ -7,7 +7,6 @@ import {
   FlaskConical,
   Building2,
   Landmark,
-  Shield,
   Lock,
 } from "lucide-react";
 import type { CSSProperties } from "react";
@@ -37,10 +36,6 @@ const DISCOVER_ITEMS: NavItem[] = [
   { label: "Labs", path: "/labs", icon: FlaskConical },
   { label: "Facilities", path: "/facilities", icon: Building2 },
   { label: "Institutions", path: "/institutions", icon: Landmark },
-];
-
-const MEMBER_ITEMS: NavItem[] = [
-  { label: "Admin", path: "/admin-dashboard", icon: Shield },
 ];
 
 export function Sidebar({
@@ -84,7 +79,7 @@ export function Sidebar({
   };
 
   return (
-    <header className="sticky top-0 z-30 border-b border-[#5f0000] bg-white shadow-md shadow-black/10">
+    <header className="fixed inset-x-0 top-0 z-[100] isolate overflow-hidden border-b border-[#5f0000] bg-white shadow-md shadow-black/10">
       <div className="flex h-20">
         <a
           href="https://www.salisbury.edu"
@@ -105,35 +100,41 @@ export function Sidebar({
           aria-hidden="true"
         />
 
-        <div className="relative flex min-w-0 flex-1 bg-[#8b0000]">
+        <div className="flex min-w-0 flex-1 bg-[#8b0000]">
           <div className="flex min-w-0 flex-1 items-stretch justify-between gap-x-3 pr-4">
             <nav className="flex min-w-0 flex-1 flex-wrap items-stretch pr-4" aria-label="Main">
               {DISCOVER_ITEMS.map((item) => renderItem(item, false))}
             </nav>
-            <div className="relative flex min-w-[15rem] items-stretch justify-end pb-5">
-              {MEMBER_ITEMS.map((item) => renderItem(item, !isAuthenticated))}
+            <div className="flex min-w-[13rem] flex-col items-end justify-center gap-1 py-2">
               {!isAuthenticated && (
                 <button
                   type="button"
                   onClick={() => onNavigate("/faculty-login")}
-                  style={{ backgroundColor: "#ffc425", color: "#710000" }}
-                  className="px-5 py-2 text-sm font-semibold uppercase tracking-wide transition-colors hover:bg-[#f0b400]"
+                  className="rounded-sm border border-[#ffc425] px-4 py-1.5 text-sm font-semibold uppercase tracking-wide text-[#ffc425] transition-colors hover:bg-[#ffc425] hover:text-[#710000]"
                 >
-                  Sign in
+                  Faculty Sign In
                 </button>
               )}
+              {isAuthenticated && (
+                <button
+                  type="button"
+                  onClick={() => onNavigate("/faculty-dashboard")}
+                  className="rounded-sm border border-[#ffc425] px-4 py-1.5 text-sm font-semibold uppercase tracking-wide text-[#ffc425] transition-colors hover:bg-[#ffc425] hover:text-[#710000]"
+                >
+                  Faculty Portal
+                </button>
+              )}
+              <div
+                className="flex items-center gap-2 text-xs font-medium"
+                style={{ color: "rgba(255,255,255,0.88)" }}
+              >
+                <span className="h-2 w-2 rounded-full bg-[#ffc425]" aria-hidden="true" />
+                <span>
+                  Network live
+                  {typeof expertCount === "number" ? ` · ${expertCount.toLocaleString()} experts` : ""}
+                </span>
+              </div>
             </div>
-          </div>
-
-          <div
-            className="absolute bottom-1 right-4 flex min-w-[15rem] justify-end gap-2 text-xs font-medium"
-            style={{ color: "rgba(255,255,255,0.88)" }}
-          >
-            <span className="h-2 w-2 rounded-full bg-[#ffc425]" aria-hidden="true" />
-            <span>
-              Network live
-              {typeof expertCount === "number" ? ` · ${expertCount.toLocaleString()} experts` : ""}
-            </span>
           </div>
         </div>
       </div>

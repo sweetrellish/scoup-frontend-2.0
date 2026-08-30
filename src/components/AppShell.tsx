@@ -40,7 +40,7 @@ export function AppShell({
         isAuthenticated={isAuthenticated}
         expertCount={expertCount}
       />
-      <main className="min-w-0 flex-1">{children}</main>
+      <main className="relative z-0 min-w-0 flex-1 pt-20">{children}</main>
     </div>
   );
 }
