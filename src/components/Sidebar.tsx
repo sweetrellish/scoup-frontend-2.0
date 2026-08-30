@@ -63,15 +63,15 @@ export function Sidebar({
         aria-current={active ? "page" : undefined}
         style={itemStyle}
         className={[
-          "relative flex h-full items-center gap-1.5 px-2.5 py-2 text-sm font-semibold uppercase tracking-wide transition-colors xl:gap-2 xl:px-3",
+          "relative flex h-full items-center justify-center gap-1.5 px-2 py-2 text-sm font-semibold uppercase tracking-wide transition-colors xl:px-2.5 2xl:gap-2 2xl:px-3",
           active
-            ? "after:absolute after:bottom-0 after:left-2.5 after:right-2.5 after:h-1 after:bg-[#ffc425] xl:after:left-3 xl:after:right-3"
+            ? "after:absolute after:bottom-0 after:left-2 after:right-2 after:h-1 after:bg-[#ffc425] xl:after:left-2.5 xl:after:right-2.5"
             : locked
               ? "hover:bg-white/5"
               : "hover:bg-[#710000]",
         ].join(" ")}
       >
-        <Icon className="h-4 w-4 shrink-0" aria-hidden="true" />
+        <Icon className="hidden h-4 w-4 shrink-0 2xl:block" aria-hidden="true" />
         <span className="whitespace-nowrap">{item.label}</span>
         {locked && <Lock className="w-3 h-3 shrink-0" aria-hidden="true" />}
       </button>
@@ -85,13 +85,13 @@ export function Sidebar({
           href="https://www.salisbury.edu"
           target="_blank"
           rel="noopener noreferrer"
-          className="relative z-20 flex w-64 shrink-0 items-center bg-white px-7 py-3 text-left"
+          className="relative z-20 flex w-56 shrink-0 items-center justify-center bg-white px-5 py-3 text-left"
         >
           <img
             src={salisburyLogo}
             alt={institution}
-            className="h-10 w-auto object-contain"
-            style={{ maxWidth: "13.5rem" }}
+            className="h-11 w-auto object-contain"
+            style={{ maxWidth: "12.25rem" }}
           />
         </a>
 
@@ -100,12 +100,12 @@ export function Sidebar({
             className="pointer-events-none absolute inset-y-0 left-0 z-20 w-16 bg-gradient-to-r from-white via-[#fff4d0]/80 to-transparent"
             aria-hidden="true"
           />
-          <div className="flex min-w-0 flex-1 items-stretch justify-between gap-x-3 pr-10">
-            <nav className="relative z-40 flex min-w-0 flex-1 flex-nowrap items-stretch overflow-hidden pr-3" aria-label="Main">
+          <div className="flex min-w-0 flex-1 items-stretch justify-between gap-x-2 pr-8">
+            <nav className="relative z-40 flex min-w-0 flex-1 flex-nowrap items-stretch justify-start overflow-hidden pr-2" aria-label="Main">
               {DISCOVER_ITEMS.map((item) => renderItem(item, false))}
             </nav>
 
-            <div className="relative z-40 flex min-w-[9.5rem] shrink-0 flex-col items-center justify-center gap-1 py-2">
+            <div className="relative z-40 flex min-w-[9.25rem] shrink-0 flex-col items-center justify-center gap-1 py-2">
               {!isAuthenticated && (
                 <button
                   type="button"
