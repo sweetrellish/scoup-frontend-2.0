@@ -70,7 +70,7 @@ export function Sidebar({
         aria-current={active ? "page" : undefined}
         style={itemStyle}
         className={[
-          "relative flex h-full items-center justify-center gap-1.5 px-1.5 py-2 text-xs font-semibold uppercase tracking-wide transition-colors xl:gap-2 xl:px-2 xl:text-sm 2xl:px-3",
+          "relative flex h-full items-center justify-center gap-1 px-1.5 py-2 text-xs font-semibold uppercase tracking-wide transition-colors xl:gap-1.5 xl:px-2 2xl:gap-2 2xl:px-3 2xl:text-sm",
           active
             ? "after:absolute after:bottom-0 after:left-2 after:right-2 after:h-1 after:bg-[#ffc425] xl:after:left-2.5 xl:after:right-2.5"
             : locked
@@ -92,13 +92,13 @@ export function Sidebar({
           href="https://www.salisbury.edu"
           target="_blank"
           rel="noopener noreferrer"
-          className="relative z-20 flex w-48 shrink-0 items-center justify-center bg-white px-4 py-3 text-left lg:w-52 xl:w-56"
+          className="relative z-20 flex w-52 shrink-0 items-center justify-center bg-white px-4 py-3 text-left lg:w-56"
         >
           <img
             src={salisburyLogo}
             alt={institution}
-            className="h-9 w-auto object-contain lg:h-10"
-            style={{ maxWidth: "11rem" }}
+            className="h-10 w-auto object-contain"
+            style={{ maxWidth: "12rem" }}
           />
         </a>
 
@@ -107,12 +107,12 @@ export function Sidebar({
             className="pointer-events-none absolute inset-y-0 left-0 z-20 w-16 bg-gradient-to-r from-white via-[#fff4d0]/80 to-transparent"
             aria-hidden="true"
           />
-          <div className="flex min-w-0 flex-1 items-stretch justify-between gap-x-2 pr-5 lg:pr-7">
-            <nav className="relative z-40 hidden min-w-0 flex-1 flex-nowrap items-stretch justify-start overflow-hidden pr-2 lg:flex" aria-label="Main">
+          <div className="flex min-w-0 flex-1 items-stretch justify-between gap-x-2 pr-8">
+            <nav className="relative z-40 hidden min-w-0 flex-1 flex-nowrap items-stretch justify-start overflow-hidden pr-2 md:flex" aria-label="Main">
               {DISCOVER_ITEMS.map((item) => renderItem(item, false))}
             </nav>
 
-            <div className="relative z-40 hidden min-w-[8.75rem] shrink-0 flex-col items-center justify-center gap-1 py-2 lg:flex xl:min-w-[9.25rem]">
+            <div className="relative z-40 hidden min-w-[9rem] shrink-0 flex-col items-center justify-center gap-1 py-2 md:flex xl:min-w-[9.25rem]">
               {!isAuthenticated && (
                 <button
                   type="button"
@@ -157,7 +157,7 @@ export function Sidebar({
               aria-expanded={isMobileMenuOpen}
               aria-label="Open navigation menu"
               style={{ borderColor: "#ffc425", color: "#ffc425" }}
-              className="relative z-40 my-auto ml-auto inline-flex h-10 w-10 items-center justify-center rounded-sm border transition-colors hover:bg-[#710000] lg:hidden"
+              className="relative z-40 my-auto ml-auto inline-flex h-10 w-10 items-center justify-center rounded-sm border transition-colors hover:bg-[#710000] md:hidden"
             >
               {isMobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
             </button>
@@ -166,7 +166,7 @@ export function Sidebar({
         </div>
       </div>
       {isMobileMenuOpen && (
-        <div className="lg:hidden">
+        <div className="md:hidden">
           <nav className="grid grid-cols-2 gap-1 border-t border-[#ffc425]/25 bg-[#8b0000] p-3" aria-label="Mobile main">
             {DISCOVER_ITEMS.map((item) => renderItem(item, false))}
           </nav>
