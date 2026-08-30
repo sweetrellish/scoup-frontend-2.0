@@ -12,7 +12,6 @@ import {
 import type { CSSProperties } from "react";
 
 import salisburyLogo from "../assets/images/Salisbury_University_logo.png";
-import seagullWing from "../assets/images/seagull-wing-transparent.png";
 
 export interface SidebarProps {
   currentPath: string;
@@ -24,20 +23,19 @@ export interface SidebarProps {
 
 interface NavItem {
   label: string;
-  compactLabel?: string;
   path: string;
   icon: typeof Search;
 }
 
 const DISCOVER_ITEMS: NavItem[] = [
   { label: "Search", path: "/", icon: Search },
-  { label: "Expertise Map", compactLabel: "Map", path: "/expertise-map", icon: Map },
+  { label: "Expertise Map", path: "/expertise-map", icon: Map },
   { label: "Networks", path: "/networks", icon: Network },
   { label: "Experts", path: "/experts", icon: Users },
   { label: "Projects", path: "/projects", icon: FolderOpen },
   { label: "Labs", path: "/labs", icon: FlaskConical },
   { label: "Facilities", path: "/facilities", icon: Building2 },
-  { label: "Institutions", compactLabel: "Inst.", path: "/institutions", icon: Landmark },
+  { label: "Institutions", path: "/institutions", icon: Landmark },
 ];
 
 export function Sidebar({
@@ -65,7 +63,7 @@ export function Sidebar({
         aria-current={active ? "page" : undefined}
         style={itemStyle}
         className={[
-          "relative flex h-full min-w-[3.25rem] items-center justify-center gap-1 px-2 py-2 text-xs font-semibold uppercase tracking-wide transition-colors lg:min-w-0 lg:gap-1.5 lg:px-2 xl:gap-2 xl:px-3 xl:text-sm",
+          "relative flex h-full items-center gap-1.5 px-2.5 py-2 text-sm font-semibold uppercase tracking-wide transition-colors xl:gap-2 xl:px-3",
           active
             ? "after:absolute after:bottom-0 after:left-2.5 after:right-2.5 after:h-1 after:bg-[#ffc425] xl:after:left-3 xl:after:right-3"
             : locked
@@ -74,8 +72,7 @@ export function Sidebar({
         ].join(" ")}
       >
         <Icon className="h-4 w-4 shrink-0" aria-hidden="true" />
-        <span className="whitespace-nowrap lg:hidden">{item.compactLabel ?? item.label}</span>
-        <span className="hidden whitespace-nowrap lg:inline">{item.label}</span>
+        <span className="whitespace-nowrap">{item.label}</span>
         {locked && <Lock className="w-3 h-3 shrink-0" aria-hidden="true" />}
       </button>
     );
@@ -84,51 +81,28 @@ export function Sidebar({
   return (
     <header className="fixed inset-x-0 top-0 z-[100] isolate border-b border-[#5f0000] bg-white shadow-md shadow-black/10">
       <div className="relative flex h-20 items-stretch overflow-hidden">
-        
-        {/* LOGO CONTAINER */}
         <a
-          href="https://salisbury.edu"
+          href="https://www.salisbury.edu"
           target="_blank"
           rel="noopener noreferrer"
-          className="relative z-10 flex w-44 shrink-0 items-center bg-white px-4 py-3 text-left sm:w-56 sm:px-5 lg:w-64 lg:px-7"
+          className="relative z-20 flex w-64 shrink-0 items-center bg-white px-7 py-3 text-left"
         >
           <img
             src={salisburyLogo}
             alt={institution}
-            className="h-9 w-auto max-w-full object-contain sm:h-10 lg:h-11"
+            className="h-11 w-auto max-w-full object-contain"
           />
         </a>
 
-        {/* 
-          THE SEAGULL WING DIVIDER
-          - Dynamically matches the left boundary of the logo at each breakpoint
-          - Rotated -32 degrees to create the dynamic separation angle from your mockup
-        */}
-        <img
-          src={seagullWing}
-          alt=""
-          className="pointer-events-none absolute z-30 max-w-none origin-center object-contain opacity-100 left-44 sm:left-56 lg:left-64"
-          style={{
-            width: "clamp(22rem, 45vw, 36rem)",
-            height: "auto",
-            top: "50%",
-            transform: "translate(-48%, -52%) rotate(-32deg)",
-          }}
-          aria-hidden="true"
-        />
+        <div className="w-24 shrink-0 bg-gradient-to-r from-white via-[#fff4d0] to-[#8b0000]" aria-hidden="true" />
 
-        {/* NAV BAR BACKGROUND & NAVIGATION */}
-        {/* Note: Removed rounded-tl-[2rem] so the wing handles 100% of the visual transition split */}
-        <div className="relative z-20 flex min-w-0 flex-1 bg-[#8b0000] pl-12 sm:pl-16 lg:pl-20">
-          <div className="flex min-w-0 flex-1 items-stretch justify-between gap-x-2 pr-5 sm:pr-7 lg:pr-9">
-            
-            {/* Main Navigation (z-40 ensures links stay clickable over the wing asset) */}
-            <nav className="relative z-40 flex min-w-0 flex-1 flex-nowrap items-stretch overflow-hidden pr-2" aria-label="Main">
+        <div className="relative z-10 flex min-w-0 flex-1 rounded-tl-[1.75rem] bg-[#8b0000] pl-6">
+          <div className="flex min-w-0 flex-1 items-stretch justify-between gap-x-3 pr-10">
+            <nav className="relative z-40 flex min-w-0 flex-1 flex-nowrap items-stretch overflow-hidden pr-3" aria-label="Main">
               {DISCOVER_ITEMS.map((item) => renderItem(item, false))}
             </nav>
-            
-            {/* Faculty Actions */}
-            <div className="relative z-40 flex min-w-[8.75rem] shrink-0 flex-col items-center justify-center gap-1 py-2 sm:min-w-[9.5rem]">
+
+            <div className="relative z-40 flex min-w-[9.5rem] shrink-0 flex-col items-center justify-center gap-1 py-2">
               {!isAuthenticated && (
                 <button
                   type="button"
