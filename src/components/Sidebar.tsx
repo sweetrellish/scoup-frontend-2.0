@@ -83,12 +83,14 @@ export function Sidebar({
 
   return (
     <header className="fixed inset-x-0 top-0 z-[100] isolate border-b border-[#5f0000] bg-white shadow-md shadow-black/10">
-      <div className="relative flex h-20 overflow-hidden">
+      <div className="relative flex h-20 items-stretch overflow-hidden">
+        
+        {/* LOGO CONTAINER */}
         <a
-          href="https://www.salisbury.edu"
+          href="https://salisbury.edu"
           target="_blank"
           rel="noopener noreferrer"
-          className="relative z-20 flex w-44 shrink-0 items-center bg-white px-4 py-3 text-left sm:w-56 sm:px-5 lg:w-64 lg:px-7"
+          className="relative z-10 flex w-44 shrink-0 items-center bg-white px-4 py-3 text-left sm:w-56 sm:px-5 lg:w-64 lg:px-7"
         >
           <img
             src={salisburyLogo}
@@ -97,19 +99,35 @@ export function Sidebar({
           />
         </a>
 
+        {/* 
+          THE SEAGULL WING DIVIDER
+          - Dynamically matches the left boundary of the logo at each breakpoint
+          - Rotated -32 degrees to create the dynamic separation angle from your mockup
+        */}
         <img
           src={seagullWing}
           alt=""
-          className="pointer-events-none absolute z-30 max-w-none object-contain opacity-95"
-          style={{ left: "clamp(3.25rem, 13vw, 4.5rem)", top: "-0.35rem", width: "clamp(20rem, 39vw, 32rem)", height: "6rem", transform: "rotate(-5deg)" }}
+          className="pointer-events-none absolute z-30 max-w-none origin-center object-contain opacity-100 left-44 sm:left-56 lg:left-64"
+          style={{
+            width: "clamp(22rem, 45vw, 36rem)",
+            height: "auto",
+            top: "50%",
+            transform: "translate(-48%, -52%) rotate(-32deg)",
+          }}
           aria-hidden="true"
         />
 
-        <div className="relative z-10 flex min-w-0 flex-1 rounded-tl-[2rem] bg-[#8b0000] pl-5 sm:pl-7 lg:pl-8">
+        {/* NAV BAR BACKGROUND & NAVIGATION */}
+        {/* Note: Removed rounded-tl-[2rem] so the wing handles 100% of the visual transition split */}
+        <div className="relative z-20 flex min-w-0 flex-1 bg-[#8b0000] pl-12 sm:pl-16 lg:pl-20">
           <div className="flex min-w-0 flex-1 items-stretch justify-between gap-x-2 pr-5 sm:pr-7 lg:pr-9">
+            
+            {/* Main Navigation (z-40 ensures links stay clickable over the wing asset) */}
             <nav className="relative z-40 flex min-w-0 flex-1 flex-nowrap items-stretch overflow-hidden pr-2" aria-label="Main">
               {DISCOVER_ITEMS.map((item) => renderItem(item, false))}
             </nav>
+            
+            {/* Faculty Actions */}
             <div className="relative z-40 flex min-w-[8.75rem] shrink-0 flex-col items-center justify-center gap-1 py-2 sm:min-w-[9.5rem]">
               {!isAuthenticated && (
                 <button
@@ -142,6 +160,7 @@ export function Sidebar({
                 </span>
               </div>
             </div>
+
           </div>
         </div>
       </div>
