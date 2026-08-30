@@ -68,9 +68,9 @@ export function Sidebar({
         aria-current={active ? "page" : undefined}
         style={itemStyle}
         className={[
-          "relative flex h-full items-center gap-1 px-2 py-2 text-xs font-semibold uppercase tracking-wide transition-colors xl:gap-1.5 xl:px-2.5",
+          "relative flex h-full items-center gap-1 px-1.5 py-2 text-xs font-semibold uppercase tracking-wide transition-colors xl:px-2",
           active
-            ? "after:absolute after:bottom-0 after:left-2.5 after:right-2.5 after:h-1 after:bg-[#ffc425] xl:after:left-3 xl:after:right-3"
+            ? "after:absolute after:bottom-0 after:left-1.5 after:right-1.5 after:h-1 after:bg-[#ffc425] xl:after:left-2 xl:after:right-2"
             : locked
               ? "hover:bg-white/5"
               : "hover:bg-[#710000]",
@@ -90,7 +90,7 @@ export function Sidebar({
           href="https://www.salisbury.edu"
           target="_blank"
           rel="noopener noreferrer"
-          className="flex w-64 shrink-0 items-center bg-white px-6 py-3 text-left"
+          className="flex w-56 shrink-0 items-center bg-white px-5 py-3 text-left"
         >
           <img
             src={salisburyLogo}
@@ -99,18 +99,18 @@ export function Sidebar({
           />
         </a>
 
-        <div className="relative h-full w-36 shrink-0 overflow-visible bg-white" aria-hidden="true">
+        <div className="relative h-full w-28 shrink-0 overflow-visible bg-white" aria-hidden="true">
           <svg
-            viewBox="0 0 144 80"
+            viewBox="0 0 112 80"
             preserveAspectRatio="none"
             className="absolute inset-0 h-full w-full"
           >
             <path
-              d="M144 0H74C42 0 18 11 18 27v53h126Z"
+              d="M112 0H58C30 0 12 11 12 27v53h100Z"
               fill="#8b0000"
             />
           </svg>
-          <div className="absolute -left-16 top-1 h-20 w-56 overflow-visible">
+          <div className="absolute -left-16 top-2 h-16 w-52 overflow-visible">
             <img
               src={seagullWing}
               alt=""
@@ -120,17 +120,17 @@ export function Sidebar({
         </div>
 
         <div className="flex min-w-0 flex-1 rounded-tl-[2rem] bg-[#8b0000]">
-          <div className="flex min-w-0 flex-1 items-stretch justify-between gap-x-3 pr-4">
+          <div className="flex min-w-0 flex-1 items-stretch justify-between gap-x-2 pr-3">
             <nav className="flex min-w-0 flex-1 flex-nowrap items-stretch overflow-hidden pr-2" aria-label="Main">
               {DISCOVER_ITEMS.map((item) => renderItem(item, false))}
             </nav>
-            <div className="flex min-w-[9.75rem] shrink-0 flex-col items-end justify-center gap-1 py-2">
+            <div className="flex min-w-[8.75rem] shrink-0 flex-col items-end justify-center gap-1 py-2">
               {!isAuthenticated && (
                 <button
                   type="button"
                   onClick={() => onNavigate("/faculty-login")}
                   style={{ borderColor: "#ffc425", color: "#ffc425" }}
-                  className="rounded-sm border px-3 py-1.5 text-xs font-semibold uppercase tracking-wide transition-colors hover:bg-[#ffc425] hover:text-[#710000]"
+                  className="rounded-sm border px-2.5 py-1.5 text-xs font-semibold uppercase tracking-wide transition-colors hover:bg-[#ffc425] hover:text-[#710000]"
                 >
                   Faculty Sign In
                 </button>
@@ -140,7 +140,7 @@ export function Sidebar({
                   type="button"
                   onClick={() => onNavigate("/faculty-dashboard")}
                   style={{ borderColor: "#ffc425", color: "#ffc425" }}
-                  className="rounded-sm border px-3 py-1.5 text-xs font-semibold uppercase tracking-wide transition-colors hover:bg-[#ffc425] hover:text-[#710000]"
+                  className="rounded-sm border px-2.5 py-1.5 text-xs font-semibold uppercase tracking-wide transition-colors hover:bg-[#ffc425] hover:text-[#710000]"
                 >
                   Faculty Portal
                 </button>
