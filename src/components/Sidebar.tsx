@@ -63,72 +63,64 @@ export function Sidebar({
         onClick={() => (locked ? onNavigate("/faculty-login") : onNavigate(item.path))}
         aria-current={active ? "page" : undefined}
         className={[
-          "w-full flex items-center gap-3 px-3 py-2.5 rounded-md text-sm transition-colors text-left",
+          "flex h-full items-center gap-2 px-4 py-3 text-sm font-semibold uppercase tracking-wide transition-colors",
           active
-            ? "bg-[#ffc425] text-[#710000] font-semibold shadow-sm"
+            ? "bg-[#ffc425] text-[#710000]"
             : locked
               ? "text-white/45 hover:bg-white/5"
-              : "text-white/90 hover:bg-white/10 hover:text-white",
+              : "text-white hover:bg-[#710000]",
         ].join(" ")}
       >
-        <Icon className="w-4 h-4 shrink-0" aria-hidden="true" />
-        <span className="flex-1 truncate">{item.label}</span>
+        <Icon className="h-4 w-4 shrink-0" aria-hidden="true" />
+        <span className="whitespace-nowrap">{item.label}</span>
         {locked && <Lock className="w-3 h-3 shrink-0" aria-hidden="true" />}
       </button>
     );
   };
 
   return (
-    <aside className="w-64 shrink-0 border-r border-[#5f0000] bg-[#8b0000] flex flex-col h-screen sticky top-0 shadow-xl shadow-black/10">
-      <button
-        type="button"
-        onClick={() => onNavigate("/")}
-        className="px-4 py-4 text-left border-b border-[#ffc425]/35 bg-white"
-      >
-        <img
-          src={salisburyLogo}
-          alt={institution}
-          className="h-10 w-auto max-w-full object-contain"
-        />
-      </button>
+    <header className="sticky top-0 z-30 border-b border-[#5f0000] bg-white shadow-md shadow-black/10">
+      <div className="flex min-h-20">
+        <button
+          type="button"
+          onClick={() => onNavigate("/")}
+          className="flex w-64 shrink-0 items-center bg-white px-6 py-4 text-left"
+        >
+          <img
+            src={salisburyLogo}
+            alt={institution}
+            className="h-12 w-auto max-w-full object-contain"
+          />
+        </button>
 
-      <nav className="flex-1 overflow-y-auto px-3 py-4" aria-label="Main">
-        <p className="px-3 pb-2 text-[11px] font-semibold uppercase tracking-wider text-[#ffc425]">
-          Discover
-        </p>
-        <div className="space-y-0.5">
-          {DISCOVER_ITEMS.map((item) => renderItem(item, false))}
-        </div>
+        <div className="flex min-w-0 flex-1 flex-col bg-[#8b0000]">
+          <div className="flex min-h-14 flex-wrap items-stretch justify-between gap-x-4">
+            <nav className="flex min-w-0 flex-1 flex-wrap items-stretch" aria-label="Main">
+              {DISCOVER_ITEMS.map((item) => renderItem(item, false))}
+            </nav>
+            <div className="flex items-stretch">
+              {MEMBER_ITEMS.map((item) => renderItem(item, !isAuthenticated))}
+              {!isAuthenticated && (
+                <button
+                  type="button"
+                  onClick={() => onNavigate("/faculty-login")}
+                  className="bg-[#ffc425] px-5 py-3 text-sm font-semibold uppercase tracking-wide text-[#710000] transition-colors hover:bg-[#f0b400]"
+                >
+                  Sign in
+                </button>
+              )}
+            </div>
+          </div>
 
-        <p className="px-3 pt-6 pb-2 text-[11px] font-semibold uppercase tracking-wider text-[#ffc425]">
-          {isAuthenticated ? "Members" : "Members · Sign in"}
-        </p>
-        <div className="space-y-0.5">
-          {MEMBER_ITEMS.map((item) => renderItem(item, !isAuthenticated))}
+          <div className="flex items-center gap-2 border-t border-[#ffc425]/25 bg-[#710000] px-4 py-1.5 text-xs text-white/85">
+            <span className="h-2 w-2 rounded-full bg-[#ffc425]" aria-hidden="true" />
+            <span>
+              Network live
+              {typeof expertCount === "number" ? ` · ${expertCount.toLocaleString()} experts` : ""}
+            </span>
+          </div>
         </div>
-      </nav>
-
-      <div className="border-t border-[#ffc425]/25 p-4 space-y-2 bg-[#710000]">
-        <div className="flex items-center gap-2 text-xs text-white/85">
-          <span className="w-2 h-2 rounded-full bg-[#ffc425]" aria-hidden="true" />
-          <span>
-            Network live
-            {typeof expertCount === "number" ? ` · ${expertCount.toLocaleString()} experts` : ""}
-          </span>
-        </div>
-        <p className="text-[11px] leading-snug text-white/65">
-          You&apos;re searching {institution}.
-        </p>
-        {!isAuthenticated && (
-          <button
-            type="button"
-            onClick={() => onNavigate("/faculty-login")}
-            className="w-full text-xs font-semibold text-[#710000] bg-[#ffc425] hover:bg-[#f0b400] rounded-md py-2 transition-colors"
-          >
-            Sign in
-          </button>
-        )}
       </div>
-    </aside>
+    </header>
   );
 }
