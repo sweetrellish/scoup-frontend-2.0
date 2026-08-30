@@ -94,9 +94,11 @@ export function Sidebar({
           />
         </a>
 
-        <div className="w-24 shrink-0 bg-gradient-to-r from-white via-[#fff4d0] to-[#8b0000]" aria-hidden="true" />
-
-        <div className="relative z-10 flex min-w-0 flex-1 rounded-tl-[1.75rem] bg-[#8b0000] pl-6">
+        <div className="relative z-10 flex min-w-0 flex-1 bg-[#8b0000] pl-6">
+          <div
+            className="pointer-events-none absolute inset-y-0 left-0 z-20 w-16 bg-gradient-to-r from-white via-[#fff4d0]/80 to-transparent"
+            aria-hidden="true"
+          />
           <div className="flex min-w-0 flex-1 items-stretch justify-between gap-x-3 pr-10">
             <nav className="relative z-40 flex min-w-0 flex-1 flex-nowrap items-stretch overflow-hidden pr-3" aria-label="Main">
               {DISCOVER_ITEMS.map((item) => renderItem(item, false))}
