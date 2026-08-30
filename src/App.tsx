@@ -19,6 +19,7 @@ import { FacilitiesPage } from "./components/FacilitiesPage";
 import { BrowseCategories } from "./components/BrowseCategories";
 import { FacultyProfilePage } from "./components/FacultyProfilePage";
 import { Documentation } from "./components/Documentation";
+import { BetaPage } from "./components/BetaPage";
 import { PrivacyPolicy } from "./components/PrivacyPolicy";
 import { TermsOfService } from "./components/TermsOfService";
 import { CookiePolicy } from "./components/CookiePolicy";
@@ -204,6 +205,8 @@ useEffect(() => {
         return <Contact onNavigate={handleNavigate} />;
       case "/docs":
         return <Documentation onNavigate={handleNavigate} />;
+      case "/beta":
+        return <BetaPage onNavigate={handleNavigate} />;
       case "/privacy":
         return <PrivacyPolicy onNavigate={handleNavigate} />;
       case "/terms":

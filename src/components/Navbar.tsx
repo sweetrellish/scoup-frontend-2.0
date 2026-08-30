@@ -73,6 +73,16 @@ export function Navbar({ onNavigate, currentPath }: NavbarProps) {
             >
               Docs
             </button>
+            <button
+              onClick={() => onNavigate("/beta")}
+              className={`transition-colors font-medium ${
+                currentPath === "/beta"
+                  ? "text-[#8b0000] font-semibold"
+                  : "text-gray-700 hover:text-[#8b0000]"
+              }`}
+            >
+              Beta
+            </button>
           </nav>
 
           {/* Right Side - Desktop Buttons - Takes equal space as left side */}
@@ -105,6 +115,18 @@ export function Navbar({ onNavigate, currentPath }: NavbarProps) {
             className="block text-gray-700 hover:text-[#8b0000] transition-colors w-full text-left"
           >
             About SCOUP
+          </button>
+          <button
+            onClick={() => onNavigate("/docs")}
+            className="block text-gray-700 hover:text-[#8b0000] transition-colors w-full text-left"
+          >
+            Docs
+          </button>
+          <button
+            onClick={() => onNavigate("/beta")}
+            className="block text-gray-700 hover:text-[#8b0000] transition-colors w-full text-left"
+          >
+            Beta
           </button>
           <Button
             onClick={() => onNavigate("/faculty-login")}

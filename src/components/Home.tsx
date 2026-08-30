@@ -466,6 +466,13 @@ export function Home({ onNavigate }: HomeProps) {
               <p className="text-lg md:text-xl text-gray-600 max-w-2xl mx-auto font-light leading-relaxed">
                 AI-powered platform connecting Salisbury University's expertise with real-world impact.
               </p>
+              <button
+                type="button"
+                onClick={() => onNavigate("/beta")}
+                className="inline-flex items-center gap-2 rounded-full border border-[#8b0000]/20 bg-white px-5 py-2.5 text-sm font-semibold text-[#8b0000] shadow-sm hover:border-[#8b0000]/40 hover:bg-[#fff9e6] transition-colors"
+              >
+                View Beta Status
+              </button>
             </div>
 
             {/* Search Bar */}
@@ -499,8 +506,28 @@ export function Home({ onNavigate }: HomeProps) {
 
       {/* Analytics Section - Only show when not searching */}
       {!hasSearched && (
-        <section className="bg-white py-20 px-6">
-          <div className="max-w-7xl mx-auto">
+        <section className="bg-white px-6 py-20">
+          <div className="max-w-7xl mx-auto space-y-14">
+            <div className="rounded-xl border border-[#8b0000]/15 bg-[#fff9e6] p-6 md:p-8 flex flex-col md:flex-row md:items-center md:justify-between gap-6">
+              <div>
+                <p className="text-sm font-semibold uppercase tracking-wider text-[#8b0000] mb-2">
+                  Public Beta
+                </p>
+                <h2 className="text-2xl font-light text-gray-900 mb-2">
+                  Approved research discovery is live for review.
+                </h2>
+                <p className="text-sm md:text-base text-gray-600 max-w-3xl leading-relaxed">
+                  The beta experience publishes approved faculty and publication data while keeping ambiguous records private for administrative review.
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => onNavigate("/beta")}
+                className="shrink-0 rounded-full bg-[#8b0000] px-5 py-3 text-sm font-semibold text-[#ffd100] hover:bg-[#700000] transition-colors"
+              >
+                Open Beta Notes
+              </button>
+            </div>
             {publicDataError && (
               <div className="mb-8 rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-700">
                 {publicDataError}
