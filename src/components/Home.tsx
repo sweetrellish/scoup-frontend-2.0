@@ -457,7 +457,10 @@ export function Home({ onNavigate, showNavbar = true }: HomeProps) {
             {/* Heading */}
             <div className="space-y-5">
               <div className="inline-block mb-4">
-                <span className="px-4 py-2 bg-[#8b0000] text-[#ffc425] text-sm font-semibold rounded-full border border-[#ffc425]/60 shadow-sm">
+                <span
+                  className="px-4 py-2 text-sm font-semibold rounded-full border shadow-sm"
+                  style={{ backgroundColor: "#8b0000", borderColor: "#ffc425", color: "#ffc425" }}
+                >
                   Salisbury University
                 </span>
               </div>

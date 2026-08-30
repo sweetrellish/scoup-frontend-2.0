@@ -57,7 +57,7 @@ export function Sidebar({
     const Icon = item.icon;
     const active = isActive(item.path);
     const itemStyle: CSSProperties = active
-      ? { backgroundColor: "#ffc425", color: "#710000" }
+      ? { color: "#ffc425" }
       : { color: locked ? "rgba(255,255,255,0.72)" : "#ffffff" };
 
     return (
@@ -68,9 +68,9 @@ export function Sidebar({
         aria-current={active ? "page" : undefined}
         style={itemStyle}
         className={[
-          "flex h-full items-center gap-2 px-3 py-2 text-sm font-semibold uppercase tracking-wide transition-colors",
+          "relative flex h-full items-center gap-2 px-3 py-2 text-sm font-semibold uppercase tracking-wide transition-colors",
           active
-            ? "shadow-sm"
+            ? "after:absolute after:bottom-0 after:left-3 after:right-3 after:h-1 after:bg-[#ffc425]"
             : locked
               ? "hover:bg-white/5"
               : "hover:bg-[#710000]",
@@ -86,9 +86,10 @@ export function Sidebar({
   return (
     <header className="sticky top-0 z-30 border-b border-[#5f0000] bg-white shadow-md shadow-black/10">
       <div className="flex h-20">
-        <button
-          type="button"
-          onClick={() => onNavigate("/")}
+        <a
+          href="https://www.salisbury.edu"
+          target="_blank"
+          rel="noopener noreferrer"
           className="flex w-64 shrink-0 items-center bg-white px-6 py-3 text-left"
         >
           <img
@@ -96,20 +97,20 @@ export function Sidebar({
             alt={institution}
             className="h-10 w-auto max-w-full object-contain"
           />
-        </button>
+        </a>
 
         <div
-          className="h-full w-10 shrink-0 bg-[#ffc425]"
-          style={{ clipPath: "polygon(0 0, 58% 0, 100% 50%, 58% 100%, 0 100%, 36% 50%)" }}
+          className="h-full w-8 shrink-0 bg-white"
+          style={{ clipPath: "polygon(0 0, 58% 0, 100% 50%, 58% 100%, 0 100%)" }}
           aria-hidden="true"
         />
 
         <div className="relative flex min-w-0 flex-1 bg-[#8b0000]">
           <div className="flex min-w-0 flex-1 items-stretch justify-between gap-x-3 pr-4">
-            <nav className="flex min-w-0 flex-1 flex-wrap items-stretch" aria-label="Main">
+            <nav className="flex min-w-0 flex-1 flex-wrap items-stretch pr-4" aria-label="Main">
               {DISCOVER_ITEMS.map((item) => renderItem(item, false))}
             </nav>
-            <div className="flex items-stretch pb-5">
+            <div className="relative flex min-w-[15rem] items-stretch justify-end pb-5">
               {MEMBER_ITEMS.map((item) => renderItem(item, !isAuthenticated))}
               {!isAuthenticated && (
                 <button
@@ -125,7 +126,7 @@ export function Sidebar({
           </div>
 
           <div
-            className="absolute bottom-1 right-4 flex items-center gap-2 text-xs font-medium"
+            className="absolute bottom-1 right-4 flex min-w-[15rem] justify-end gap-2 text-xs font-medium"
             style={{ color: "rgba(255,255,255,0.88)" }}
           >
             <span className="h-2 w-2 rounded-full bg-[#ffc425]" aria-hidden="true" />
