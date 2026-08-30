@@ -70,9 +70,9 @@ export function Sidebar({
         aria-current={active ? "page" : undefined}
         style={itemStyle}
         className={[
-          "relative flex h-full items-center justify-center gap-1 px-1.5 py-2 text-xs font-semibold uppercase tracking-wide transition-colors md:gap-2 md:px-3 md:text-sm xl:px-4",
+          "relative flex h-full items-center justify-center gap-2 px-3 py-2 text-sm font-semibold uppercase tracking-wide transition-colors xl:gap-2.5 xl:px-4",
           active
-            ? "after:absolute after:bottom-0 after:left-2 after:right-2 after:h-1 after:bg-[#ffc425] md:after:left-3 md:after:right-3"
+            ? "after:absolute after:bottom-0 after:left-3 after:right-3 after:h-1 after:bg-[#ffc425]"
             : locked
               ? "hover:bg-white/5"
               : "hover:bg-[#710000]",
@@ -107,8 +107,8 @@ export function Sidebar({
             className="pointer-events-none absolute inset-y-0 left-0 z-20 w-16 bg-gradient-to-r from-white via-[#fff4d0]/80 to-transparent"
             aria-hidden="true"
           />
-          <div className="flex min-w-0 flex-1 items-stretch justify-between gap-x-2 pr-8">
-            <nav className="relative z-40 hidden min-w-0 flex-1 flex-nowrap items-stretch justify-start overflow-hidden pr-2 md:flex" aria-label="Main">
+          <div className="flex min-w-0 flex-1 items-stretch justify-between gap-x-4 pr-10">
+            <nav className="relative z-40 hidden min-w-0 flex-1 flex-nowrap items-stretch justify-evenly overflow-hidden pr-4 md:flex" aria-label="Main">
               {DISCOVER_ITEMS.map((item) => renderItem(item, false))}
             </nav>
 
