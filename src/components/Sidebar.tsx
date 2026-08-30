@@ -94,13 +94,28 @@ export function Sidebar({
           />
         </a>
 
-        <div
-          className="h-full w-8 shrink-0 bg-white"
-          style={{ clipPath: "polygon(0 0, 58% 0, 100% 50%, 58% 100%, 0 100%)" }}
-          aria-hidden="true"
-        />
+        <div className="relative h-full w-28 shrink-0 bg-white" aria-hidden="true">
+          <svg
+            viewBox="0 0 112 80"
+            preserveAspectRatio="none"
+            className="absolute inset-0 h-full w-full"
+          >
+            <path
+              d="M112 0H42C20 0 7 10 7 24v56h105Z"
+              fill="#8b0000"
+            />
+            <path
+              d="M8 65C30 43 45 41 57 47C68 53 72 44 77 29C82 14 91 8 104 4"
+              fill="none"
+              stroke="#ffa726"
+              strokeWidth="10"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
+        </div>
 
-        <div className="flex min-w-0 flex-1 bg-[#8b0000]">
+        <div className="flex min-w-0 flex-1 rounded-tl-[2rem] bg-[#8b0000]">
           <div className="flex min-w-0 flex-1 items-stretch justify-between gap-x-3 pr-4">
             <nav className="flex min-w-0 flex-1 flex-nowrap items-stretch overflow-x-auto overflow-y-hidden pr-4" aria-label="Main">
               {DISCOVER_ITEMS.map((item) => renderItem(item, false))}
