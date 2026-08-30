@@ -11,6 +11,8 @@ import {
   Lock,
 } from "lucide-react";
 
+import salisburyLogo from "../assets/images/Salisbury_University_logo.png";
+
 export interface SidebarProps {
   currentPath: string;
   onNavigate: (path: string) => void;
@@ -61,12 +63,12 @@ export function Sidebar({
         onClick={() => (locked ? onNavigate("/faculty-login") : onNavigate(item.path))}
         aria-current={active ? "page" : undefined}
         className={[
-          "w-full flex items-center gap-3 px-3 py-2 rounded-md text-sm transition-colors text-left",
+          "w-full flex items-center gap-3 px-3 py-2.5 rounded-md text-sm transition-colors text-left",
           active
-            ? "bg-[#8b0000]/10 text-[#8b0000] font-medium"
+            ? "bg-[#ffc425] text-[#710000] font-semibold shadow-sm"
             : locked
-              ? "text-gray-400 hover:bg-gray-50"
-              : "text-gray-700 hover:bg-gray-100",
+              ? "text-white/45 hover:bg-white/5"
+              : "text-white/90 hover:bg-white/10 hover:text-white",
         ].join(" ")}
       >
         <Icon className="w-4 h-4 shrink-0" aria-hidden="true" />
@@ -77,30 +79,28 @@ export function Sidebar({
   };
 
   return (
-    <aside className="w-64 shrink-0 border-r border-gray-200 bg-white flex flex-col h-screen sticky top-0">
+    <aside className="w-64 shrink-0 border-r border-[#5f0000] bg-[#8b0000] flex flex-col h-screen sticky top-0 shadow-xl shadow-black/10">
       <button
         type="button"
         onClick={() => onNavigate("/")}
-        className="px-5 py-5 text-left border-b border-gray-100"
+        className="px-4 py-4 text-left border-b border-[#ffc425]/35 bg-white"
       >
-        <div className="flex items-center gap-2">
-          <span className="text-lg font-semibold text-[#8b0000]">SCOUP</span>
-          <span className="text-[10px] uppercase tracking-wide bg-gray-100 text-gray-600 px-1.5 py-0.5 rounded">
-            Beta
-          </span>
-        </div>
-        <p className="text-xs text-gray-500 mt-0.5">{institution}</p>
+        <img
+          src={salisburyLogo}
+          alt={institution}
+          className="h-10 w-auto max-w-full object-contain"
+        />
       </button>
 
       <nav className="flex-1 overflow-y-auto px-3 py-4" aria-label="Main">
-        <p className="px-3 pb-2 text-[11px] font-semibold uppercase tracking-wider text-gray-400">
+        <p className="px-3 pb-2 text-[11px] font-semibold uppercase tracking-wider text-[#ffc425]">
           Discover
         </p>
         <div className="space-y-0.5">
           {DISCOVER_ITEMS.map((item) => renderItem(item, false))}
         </div>
 
-        <p className="px-3 pt-6 pb-2 text-[11px] font-semibold uppercase tracking-wider text-gray-400">
+        <p className="px-3 pt-6 pb-2 text-[11px] font-semibold uppercase tracking-wider text-[#ffc425]">
           {isAuthenticated ? "Members" : "Members · Sign in"}
         </p>
         <div className="space-y-0.5">
@@ -108,22 +108,22 @@ export function Sidebar({
         </div>
       </nav>
 
-      <div className="border-t border-gray-100 p-4 space-y-2">
-        <div className="flex items-center gap-2 text-xs text-gray-600">
-          <span className="w-2 h-2 rounded-full bg-green-500" aria-hidden="true" />
+      <div className="border-t border-[#ffc425]/25 p-4 space-y-2 bg-[#710000]">
+        <div className="flex items-center gap-2 text-xs text-white/85">
+          <span className="w-2 h-2 rounded-full bg-[#ffc425]" aria-hidden="true" />
           <span>
             Network live
             {typeof expertCount === "number" ? ` · ${expertCount.toLocaleString()} experts` : ""}
           </span>
         </div>
-        <p className="text-[11px] leading-snug text-gray-500">
+        <p className="text-[11px] leading-snug text-white/65">
           You&apos;re searching {institution}.
         </p>
         {!isAuthenticated && (
           <button
             type="button"
             onClick={() => onNavigate("/faculty-login")}
-            className="w-full text-xs font-medium text-white bg-[#8b0000] hover:bg-[#6f0000] rounded-md py-2 transition-colors"
+            className="w-full text-xs font-semibold text-[#710000] bg-[#ffc425] hover:bg-[#f0b400] rounded-md py-2 transition-colors"
           >
             Sign in
           </button>
