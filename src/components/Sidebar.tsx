@@ -24,19 +24,20 @@ export interface SidebarProps {
 
 interface NavItem {
   label: string;
+  compactLabel?: string;
   path: string;
   icon: typeof Search;
 }
 
 const DISCOVER_ITEMS: NavItem[] = [
   { label: "Search", path: "/", icon: Search },
-  { label: "Expertise Map", path: "/expertise-map", icon: Map },
+  { label: "Expertise Map", compactLabel: "Map", path: "/expertise-map", icon: Map },
   { label: "Networks", path: "/networks", icon: Network },
   { label: "Experts", path: "/experts", icon: Users },
   { label: "Projects", path: "/projects", icon: FolderOpen },
   { label: "Labs", path: "/labs", icon: FlaskConical },
   { label: "Facilities", path: "/facilities", icon: Building2 },
-  { label: "Institutions", path: "/institutions", icon: Landmark },
+  { label: "Institutions", compactLabel: "Inst.", path: "/institutions", icon: Landmark },
 ];
 
 export function Sidebar({
@@ -64,7 +65,7 @@ export function Sidebar({
         aria-current={active ? "page" : undefined}
         style={itemStyle}
         className={[
-          "relative flex h-full items-center gap-1.5 px-2.5 py-2 text-sm font-semibold uppercase tracking-wide transition-colors xl:gap-2 xl:px-3",
+          "relative flex h-full min-w-[3.25rem] items-center justify-center gap-1 px-2 py-2 text-xs font-semibold uppercase tracking-wide transition-colors lg:min-w-0 lg:gap-1.5 lg:px-2 xl:gap-2 xl:px-3 xl:text-sm",
           active
             ? "after:absolute after:bottom-0 after:left-2.5 after:right-2.5 after:h-1 after:bg-[#ffc425] xl:after:left-3 xl:after:right-3"
             : locked
@@ -73,7 +74,8 @@ export function Sidebar({
         ].join(" ")}
       >
         <Icon className="h-4 w-4 shrink-0" aria-hidden="true" />
-        <span className="whitespace-nowrap">{item.label}</span>
+        <span className="whitespace-nowrap lg:hidden">{item.compactLabel ?? item.label}</span>
+        <span className="hidden whitespace-nowrap lg:inline">{item.label}</span>
         {locked && <Lock className="w-3 h-3 shrink-0" aria-hidden="true" />}
       </button>
     );
@@ -86,12 +88,12 @@ export function Sidebar({
           href="https://www.salisbury.edu"
           target="_blank"
           rel="noopener noreferrer"
-          className="relative z-20 flex w-64 shrink-0 items-center bg-white px-7 py-3 text-left"
+          className="relative z-20 flex w-44 shrink-0 items-center bg-white px-4 py-3 text-left sm:w-56 sm:px-5 lg:w-64 lg:px-7"
         >
           <img
             src={salisburyLogo}
             alt={institution}
-            className="h-11 w-auto max-w-full object-contain"
+            className="h-9 w-auto max-w-full object-contain sm:h-10 lg:h-11"
           />
         </a>
 
@@ -99,16 +101,16 @@ export function Sidebar({
           src={seagullWing}
           alt=""
           className="pointer-events-none absolute z-30 max-w-none object-contain opacity-95"
-          style={{ left: "4.5rem", top: "-0.35rem", width: "32rem", height: "6rem", transform: "rotate(-5deg)" }}
+          style={{ left: "clamp(3.25rem, 13vw, 4.5rem)", top: "-0.35rem", width: "clamp(20rem, 39vw, 32rem)", height: "6rem", transform: "rotate(-5deg)" }}
           aria-hidden="true"
         />
 
-        <div className="relative z-10 flex min-w-0 flex-1 rounded-tl-[2rem] bg-[#8b0000] pl-8">
-          <div className="flex min-w-0 flex-1 items-stretch justify-between gap-x-2 pr-3">
+        <div className="relative z-10 flex min-w-0 flex-1 rounded-tl-[2rem] bg-[#8b0000] pl-5 sm:pl-7 lg:pl-8">
+          <div className="flex min-w-0 flex-1 items-stretch justify-between gap-x-2 pr-5 sm:pr-7 lg:pr-9">
             <nav className="relative z-40 flex min-w-0 flex-1 flex-nowrap items-stretch overflow-hidden pr-2" aria-label="Main">
               {DISCOVER_ITEMS.map((item) => renderItem(item, false))}
             </nav>
-            <div className="relative z-40 flex min-w-[8.75rem] shrink-0 flex-col items-end justify-center gap-1 py-2">
+            <div className="relative z-40 flex min-w-[8.75rem] shrink-0 flex-col items-center justify-center gap-1 py-2 sm:min-w-[9.5rem]">
               {!isAuthenticated && (
                 <button
                   type="button"
