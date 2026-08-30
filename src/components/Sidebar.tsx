@@ -12,6 +12,7 @@ import {
 import type { CSSProperties } from "react";
 
 import salisburyLogo from "../assets/images/Salisbury_University_logo.png";
+import suMark from "../assets/images/su-logo.png";
 
 export interface SidebarProps {
   currentPath: string;
@@ -99,25 +100,25 @@ export function Sidebar({
           />
         </a>
 
-        <div className="relative h-full w-20 shrink-0 bg-white" aria-hidden="true">
+        <div className="relative h-full w-24 shrink-0 overflow-visible bg-white" aria-hidden="true">
           <svg
-            viewBox="0 0 80 80"
+            viewBox="0 0 96 80"
             preserveAspectRatio="none"
             className="absolute inset-0 h-full w-full"
           >
             <path
-              d="M80 0H34C17 0 6 10 6 23v57h74Z"
+              d="M96 0H44C22 0 8 11 8 25v55h88Z"
               fill="#8b0000"
             />
-            <path
-              d="M7 65C23 47 36 42 47 47C57 52 58 43 63 30C67 16 70 9 76 5"
-              fill="none"
-              stroke="#ffa726"
-              strokeWidth="8"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
           </svg>
+          <div className="absolute -left-10 -top-6 h-24 w-36 overflow-hidden">
+            <img
+              src={suMark}
+              alt=""
+              className="absolute h-44 w-44 max-w-none object-contain"
+              style={{ left: "-32px", top: "-20px" }}
+            />
+          </div>
         </div>
 
         <div className="flex min-w-0 flex-1 rounded-tl-[2rem] bg-[#8b0000]">
