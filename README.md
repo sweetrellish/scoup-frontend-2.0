@@ -2,7 +2,7 @@
 
 **Salisbury University · v2.0**
 
-SCOUP (Salisbury Collaborative Open University Platform) is a full-stack web application that makes Salisbury University faculty research expertise discoverable to external collaborators, industry partners, and the public. It combines AI-powered semantic search, structured research browsing by discipline, faculty portfolio management, and a direct communication pipeline between all parties.
+SCOUP is a faculty research-discovery application that makes Salisbury University expertise discoverable to external collaborators, industry partners, and the public. It combines search, structured research browsing, faculty profiles, and direct communication flows.
 
 ---
 
@@ -21,8 +21,8 @@ SCOUP (Salisbury Collaborative Open University Platform) is a full-stack web app
 
 | Service | URL |
 |---|---|
-| Frontend | [scoup-frontend-2-0.onrender.com](https://scoup-frontend-2-0.onrender.com) |
-| Backend API | [scoup-backend.onrender.com/api/](https://scoup-backend.onrender.com/api/) |
+| Frontend | Public deployment URL |
+| Backend API | Public API URL |
 
 ---
 
@@ -55,7 +55,6 @@ By default the frontend points to the production backend. To use a local backend
 ## Running the Backend Locally
 
 ```bash
-cd ../scoupdb
 python -m venv venv
 source venv/bin/activate      # Windows: venv\Scripts\activate
 pip install -r requirements.txt
@@ -90,28 +89,16 @@ Required environment variables (set in `.env` or Render dashboard):
 
 | File | What it covers |
 |---|---|
+| `docs/documentation-index.md` | Entry point for the current frontend documentation set |
 | `docs/frontend-overview.md` | Every public page, faculty dashboard tab, and admin dashboard tab — what each does and how it works |
-| `scoupdb/docs/backend-architecture-and-api.md` | Data models, API endpoints, backend structure |
-| `scoupdb/docs/search-engine.md` | How the search engine works — lexical scoring, semantic fallback, query expansion |
-| `HANDOFF_NOTES.md` | Backend architecture decisions — school/department model, faculty review workflow |
-| `PRESENTATION_NOTES.txt` | Why the search engine moved from client-side to server-side |
+| `docs/current-implementation-playbook.md` | Current product architecture, data flow, and live implementation details |
+| `docs/website-overview.md` | High-level overview of the application experience and product scope |
 
 ---
 
 ## Project Structure
 
-```
-SCOUP_FINAL/
-├── scoup-frontend-2.0/     # React frontend
-│   ├── src/
-│   │   ├── App.tsx         # Root router and auth state
-│   │   ├── components/     # All pages and dashboard tabs
-│   │   └── utils/api.ts    # All API calls and token management
-│   └── docs/               # Frontend documentation
-└── scoupdb/                # Django backend
-    ├── academic/           # Core app — models, views, search, auth
-    └── docs/               # Backend documentation
-```
+The application is organized as a frontend and backend pair, with the frontend handling the user experience and the backend handling API access, trust rules, and review processes.
 
 ---
 
@@ -120,6 +107,32 @@ SCOUP_FINAL/
 - **Public** — no login required; can search, browse, submit inquiries and support tickets
 - **Faculty** — self-register at `/faculty-signup`; account requires admin approval before login works
 - **Admin** — Django staff or superuser account; login at `/admin-login`
+
+---
+
+## Supplemental Current-State Documentation
+
+The project has evolved beyond the original README. This repository now includes the following additional references that reflect the current implementation and the logic behind the live experience:
+
+- `docs/documentation-index.md` — index for the current docs set
+- `docs/current-implementation-playbook.md` — current frontend architecture, search behavior, public discovery flows, and admin review pattern
+- `docs/frontend-overview.md` — detailed feature overview for the public, faculty, and admin experiences
+- `docs/website-overview.md` — project-level overview of the system and user flows
+
+### Current architecture summary
+
+The frontend now loads a public dataset from the backend and renders it through a search-and-discovery experience that includes:
+
+- confidence-aware result cards
+- faculty and project inquiry flows
+- filters across faculty, papers, patents, and projects
+- expertise-map bubble exploration
+- public faculty profile pages
+- admin approval queue patterns mirroring the current backend review logic
+
+### Current data trust model
+
+The frontend is designed to sit on top of a backend that enforces approved-only public visibility and keeps ambiguous or unverified content in private review queues. That means the user-facing product is intentionally safer than a raw metadata dump and is designed to be presentation-ready, not just data-rich.
 
 ---
 
