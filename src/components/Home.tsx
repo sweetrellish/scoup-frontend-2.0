@@ -457,12 +457,12 @@ export function Home({ onNavigate, showNavbar = true }: HomeProps) {
             {/* Heading */}
             <div className="space-y-5">
               <div className="inline-block mb-4">
-                <span className="px-4 py-2 bg-[#8b0000] text-[#ffd100] text-sm font-medium rounded-full">
+                <span className="px-4 py-2 bg-[#ffc425] text-[#710000] text-sm font-semibold rounded-full shadow-sm">
                   Salisbury University
                 </span>
               </div>
-              <h1 className="text-5xl md:text-6xl lg:text-7xl font-light text-gray-900 tracking-tight">
-                Discover. <span className="text-[#8b0000]">Connect.</span> Collaborate.
+              <h1 className="text-5xl md:text-6xl lg:text-7xl font-light text-[#7a0000] tracking-tight">
+                Discover. <span className="text-[#b27800]">Connect.</span> Collaborate.
               </h1>
               <p className="text-lg md:text-xl text-gray-600 max-w-2xl mx-auto font-light leading-relaxed">
                 AI-powered platform connecting Salisbury University's expertise with real-world impact.
@@ -507,7 +507,7 @@ export function Home({ onNavigate, showNavbar = true }: HomeProps) {
                 <p className="text-sm font-semibold uppercase tracking-wider text-[#8b0000] mb-2">
                   Public Beta
                 </p>
-                <h2 className="text-2xl font-light text-gray-900 mb-2">
+                <h2 className="text-2xl font-light text-[#7a0000] mb-2">
                   Approved research discovery is live for review.
                 </h2>
                 <p className="text-sm md:text-base text-gray-600 max-w-3xl leading-relaxed">
@@ -522,8 +522,8 @@ export function Home({ onNavigate, showNavbar = true }: HomeProps) {
             )}
             {/* Section Header */}
             <div className="text-center mb-12">
-              <h2 className="text-4xl font-light text-gray-900 mb-4">
-                Platform <span className="text-[#8b0000]">Analytics</span>
+              <h2 className="text-4xl font-light text-[#7a0000] mb-4">
+                Platform <span className="text-[#b27800]">Analytics</span>
               </h2>
               <p className="text-lg text-gray-600 max-w-2xl mx-auto font-light">
                 Explore Salisbury University's growing research footprint and faculty expertise across departments
@@ -539,7 +539,7 @@ export function Home({ onNavigate, showNavbar = true }: HomeProps) {
                     <TrendingUp className="w-5 h-5 text-[#ffd100]" />
                   </div>
                   <div>
-                    <h3 className="text-xl font-medium text-gray-900">Publications Per Year</h3>
+                    <h3 className="text-xl font-medium text-[#7a0000]">Publications Per Year</h3>
                     <p className="text-sm text-gray-600">Research output trend over time</p>
                   </div>
                 </div>
@@ -597,7 +597,7 @@ export function Home({ onNavigate, showNavbar = true }: HomeProps) {
                   <div className="h-80 flex items-center justify-center bg-gray-50 rounded-lg border-2 border-dashed border-gray-300">
                     <div className="text-center px-4">
                       <TrendingUp className="w-12 h-12 text-gray-400 mx-auto mb-3" />
-                      <h4 className="text-lg font-medium text-gray-900 mb-2">No Publication Data</h4>
+                      <h4 className="text-lg font-medium text-[#7a0000] mb-2">No Publication Data</h4>
                       <p className="text-sm text-gray-600">
                         Publication analytics will appear here once data is added to the system.
                       </p>
@@ -613,7 +613,7 @@ export function Home({ onNavigate, showNavbar = true }: HomeProps) {
                     <Users className="w-5 h-5 text-[#ffd100]" />
                   </div>
                   <div>
-                    <h3 className="text-xl font-medium text-gray-900">Faculty by Department</h3>
+                    <h3 className="text-xl font-medium text-[#7a0000]">Faculty by Department</h3>
                     <p className="text-sm text-gray-600">Top departments by faculty affiliation</p>
                   </div>
                 </div>
@@ -696,7 +696,7 @@ export function Home({ onNavigate, showNavbar = true }: HomeProps) {
                   <div className="h-80 flex items-center justify-center bg-gray-50 rounded-lg border-2 border-dashed border-gray-300">
                     <div className="text-center px-4">
                       <Users className="w-12 h-12 text-gray-400 mx-auto mb-3" />
-                      <h4 className="text-lg font-medium text-gray-900 mb-2">No Faculty Data</h4>
+                      <h4 className="text-lg font-medium text-[#7a0000] mb-2">No Faculty Data</h4>
                       <p className="text-sm text-gray-600">
                         Faculty analytics will appear here once data is added to the system.
                       </p>

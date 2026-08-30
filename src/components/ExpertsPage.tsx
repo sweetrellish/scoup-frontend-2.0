@@ -57,7 +57,7 @@ export function ExpertsPage({ onNavigate }: ExpertsPageProps) {
   return (
     <div className="p-8 max-w-6xl">
       <header className="mb-6">
-        <h1 className="text-2xl font-semibold text-gray-900">Experts</h1>
+        <h1 className="text-2xl font-semibold text-[#7a0000]">Experts</h1>
         <p className="text-sm text-gray-600 mt-1">
           Faculty ranked by how closely their research matches your search.
         </p>

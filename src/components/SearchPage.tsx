@@ -79,7 +79,7 @@ export function SearchPage() {
   return (
     <div className="p-8 max-w-5xl">
       <header className="mb-6">
-        <h1 className="text-2xl font-semibold text-gray-900">Search</h1>
+        <h1 className="text-2xl font-semibold text-[#7a0000]">Search</h1>
         <p className="text-sm text-gray-600 mt-1">
           Ranked search across the full publication corpus, with filters and match
           explanations.
