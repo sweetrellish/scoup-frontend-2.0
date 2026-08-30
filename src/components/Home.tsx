@@ -466,7 +466,7 @@ export function Home({ onNavigate, showNavbar = true }: HomeProps) {
               </div>
               <h1
                 className="text-5xl md:text-6xl lg:text-7xl font-light tracking-tight"
-                style={{ color: "#7a0000" }}
+                style={{ color: "#111827" }}
               >
                 Discover. <span style={{ color: "#8b0000" }}>Connect.</span> Collaborate.
               </h1>

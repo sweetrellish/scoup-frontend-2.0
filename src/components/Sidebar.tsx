@@ -41,7 +41,6 @@ const DISCOVER_ITEMS: NavItem[] = [
 
 const COMPACT_LABELS: Record<string, string> = {
   "Expertise Map": "Map",
-  Institutions: "Inst.",
 };
 
 export function Sidebar({
@@ -100,23 +99,23 @@ export function Sidebar({
           />
         </a>
 
-        <div className="relative h-full w-24 shrink-0 overflow-visible bg-white" aria-hidden="true">
+        <div className="relative h-full w-32 shrink-0 overflow-visible bg-white" aria-hidden="true">
           <svg
-            viewBox="0 0 96 80"
+            viewBox="0 0 128 80"
             preserveAspectRatio="none"
             className="absolute inset-0 h-full w-full"
           >
             <path
-              d="M96 0H44C22 0 8 11 8 25v55h88Z"
+              d="M128 0H62C34 0 13 11 13 27v53h115Z"
               fill="#8b0000"
             />
           </svg>
-          <div className="absolute -left-10 -top-6 h-24 w-36 overflow-hidden">
+          <div className="absolute -left-12 -top-10 h-28 w-52 overflow-hidden">
             <img
               src={suMark}
               alt=""
-              className="absolute h-44 w-44 max-w-none object-contain"
-              style={{ left: "-32px", top: "-20px" }}
+              className="absolute h-64 w-64 max-w-none object-contain"
+              style={{ left: "-36px", top: "-26px" }}
             />
           </div>
         </div>
@@ -126,7 +125,7 @@ export function Sidebar({
             <nav className="flex min-w-0 flex-1 flex-nowrap items-stretch overflow-hidden pr-2" aria-label="Main">
               {DISCOVER_ITEMS.map((item) => renderItem(item, false))}
             </nav>
-            <div className="flex min-w-[10.5rem] shrink-0 flex-col items-end justify-center gap-1 py-2">
+            <div className="flex min-w-[9.75rem] shrink-0 flex-col items-end justify-center gap-1 py-2">
               {!isAuthenticated && (
                 <button
                   type="button"
