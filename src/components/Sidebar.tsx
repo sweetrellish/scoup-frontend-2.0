@@ -79,7 +79,7 @@ export function Sidebar({
   };
 
   return (
-    <header className="fixed inset-x-0 top-0 z-[100] isolate overflow-hidden border-b border-[#5f0000] bg-white shadow-md shadow-black/10">
+    <header className="fixed inset-x-0 top-0 z-[100] isolate border-b border-[#5f0000] bg-white shadow-md shadow-black/10">
       <div className="flex h-20">
         <a
           href="https://www.salisbury.edu"
@@ -102,10 +102,10 @@ export function Sidebar({
 
         <div className="flex min-w-0 flex-1 bg-[#8b0000]">
           <div className="flex min-w-0 flex-1 items-stretch justify-between gap-x-3 pr-4">
-            <nav className="flex min-w-0 flex-1 flex-wrap items-stretch pr-4" aria-label="Main">
+            <nav className="flex min-w-0 flex-1 flex-nowrap items-stretch overflow-x-auto overflow-y-hidden pr-4" aria-label="Main">
               {DISCOVER_ITEMS.map((item) => renderItem(item, false))}
             </nav>
-            <div className="flex min-w-[12rem] flex-col items-end justify-center gap-1 py-2">
+            <div className="flex min-w-[12rem] shrink-0 flex-col items-end justify-center gap-1 py-2">
               {!isAuthenticated && (
                 <button
                   type="button"
