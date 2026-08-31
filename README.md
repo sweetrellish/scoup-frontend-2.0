@@ -34,7 +34,7 @@ SCOUP is a faculty research-discovery application that makes Salisbury Universit
 | Backend | Django 4, Django REST Framework |
 | Database | PostgreSQL (Render) / SQLite (local dev) |
 | Auth | JWT (djangorestframework-simplejwt) |
-| AI / ML | OpenAI API — keyword generation, bio generation, CV extraction, semantic search |
+| AI / ML | Anthrobpic/OpenAI API — keyword generation, bio generation, CV extraction, semantic search |
 | Deployment | Render (backend + frontend static) |
 
 ---
