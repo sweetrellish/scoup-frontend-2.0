@@ -434,7 +434,7 @@ result card - filter chip, inquiry button, slide-over and all - was **unreachabl
 page**, and linking it would have produced nothing but dead weight. Confirmed against the live
 API before changing anything:
 
-```
+```terminal
 $ curl -s "https://scoup-salisbury.net/api/search/?q=machine+learning" | jq '.results[0] | keys'
 # paper fields only - no faculty in the response at any query
 ```
@@ -526,7 +526,7 @@ one-line description, subtopic chips, then the experts.
 
 | Reference | Here | Reason |
 | --- | --- | --- |
-| Five metric bars: Acad / Prac / Pub / Collab / Net | Three: papers, citations, citations per paper | `Faculty.academic|practice|publication` are populated on **86 of 1,719** records and hold raw counts, not 0-100 scores; there is no collaboration or network field at all. The three shown are populated for effectively every listed record. |
+| Five metric bars: Acad / Prac / Pub / Collab / Net | Three: papers, citations, citations per paper | `Faculty.academic | practice | publication` are populated on **86 of 1,719** records and hold raw counts, not 0-100 scores; there is no collaboration or network field at all. The three shown are populated for effectively every listed record. |
 | "OVERALL" score | **Prominence**, from the backend's `_default_prominence` | Real signals only - directory verification 45, department 10, title 5, papers up to 20, citations up to 20. Reused, not reinvented, so the Networks page and this page rank the same person identically (Chao Miao is 91 on both). The composition is in the number's tooltip. |
 | Generated "Why recommended" prose | "Listed under *Sociology, general* and 2 more sub-areas - 7 of their 32 papers are keyworded to sociology" | Assembled from `matched_categories` and `paper_ids`, the fields that actually put the person in this area. The papers clause is omitted when the count is zero rather than padded. |
 | Green "Available" status dot | Omitted; a **Directory verified** badge where the record really is | There is no availability signal in the data. Every faculty row the endpoint returns is already `profile_visibility=True`, so a dot driven off it would be a light that is always on. |
@@ -702,6 +702,46 @@ confirmed by re-running `tsc` against a stashed tree, which reports the same two
   work. They were **left out** of commit `f82e1b1`, which contains only the four files listed
   above.
 
+### 2026-08-30 13:35 - Public beta header finalized on the live site
+
+- **Restore ID:** `SITE-*` from the deploy manager backup created during the corresponding deploy
+- **Type:** Frontend source and deployed build
+- **Primary file changed:** `src/components/Sidebar.tsx`
+- **Related files already involved in this launch:** `src/App.tsx`, `src/components/Home.tsx`
+
+The public home page now uses the same discovery navigation system as the expert/discovery pages,
+so the main product navigation is consistent across the live site. The header was iterated through
+several visual treatments and settled on a simpler Salisbury University-themed horizontal banner:
+
+- SU wordmark on the left, linked to `https://www.salisbury.edu`
+- cardinal/burgundy discovery navigation bar
+- narrow visual-only white/gold/burgundy gradient overlay between the logo area and nav area
+- full desktop labels for Search, Expertise Map, Networks, Experts, Projects, Labs, Facilities,
+  and Institutions
+- icons retained in the desktop navigation
+- `Search` routes back to `/`, preserving the large home-page search bar as the main search entry
+- `Faculty Sign In` sits in the right-side action area with the live expert count underneath
+- mobile/narrow layouts use a hamburger menu rather than attempting to squeeze the full nav into
+  the header
+
+The seagull-divider concept was intentionally backed out of the active header after testing. The
+isolated seagull asset remains in the repository, but the current shipped treatment uses the
+gradient seam because it is more stable, easier to read, and does not fight the available width.
+
+**Verification after deploy:**
+
+| Check | Result |
+| --- | --- |
+| desktop/public header | SU logo, discovery nav, Faculty Sign In, and Network live all render |
+| mobile/narrow header | hamburger menu opens and lists every discovery destination |
+| labels | full labels restored on desktop; mobile menu shows all destinations |
+| home Search action | routes to `/` and preserves the large home search bar |
+| public dataset | `/api/public/search-data/` returns 200 and hydrates stats/charts |
+| build | `npm run build` succeeds |
+
+**Repo-state note.** `README.md`, `OPERATIONS_LOG.md`, and `src/components/Sidebar.bak` were
+already dirty/untracked during this pass. The header commits intentionally staged only active
+source changes required for deployment.
 
 ---
 

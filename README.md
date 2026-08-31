@@ -1,6 +1,6 @@
 # SCOUP — Faculty Research Discovery Platform
 
-**Salisbury University · v2.0**
+Salisbury University · v2.0
 
 SCOUP is a faculty research-discovery application that makes Salisbury University expertise discoverable to external collaborators, industry partners, and the public. It combines search, structured research browsing, faculty profiles, and direct communication flows.
 
@@ -9,7 +9,7 @@ SCOUP is a faculty research-discovery application that makes Salisbury Universit
 ## What It Does
 
 | For the Public | For Faculty | For Admins |
-|---|---|---|
+| --- | --- | --- |
 | Search faculty, papers, patents, and projects by natural language query | Manage a full research profile — publications, patents, projects, CV upload | Approve and manage faculty accounts |
 | Browse 16 NSF research disciplines with faculty and theme carousels | View analytics on citations, co-authorship, and publication trends | Send direct portal messages to faculty |
 | Send collaboration inquiries directly from search results | Receive and manage collaboration inquiries | Review and act on all platform inquiries |
@@ -20,7 +20,7 @@ SCOUP is a faculty research-discovery application that makes Salisbury Universit
 ## Live URLs
 
 | Service | URL |
-|---|---|
+| --- | --- |
 | Frontend | Public deployment URL |
 | Backend API | Public API URL |
 
@@ -29,7 +29,7 @@ SCOUP is a faculty research-discovery application that makes Salisbury Universit
 ## Tech Stack
 
 | Layer | Technology |
-|---|---|
+| --- | --- |
 | Frontend | React 18, TypeScript, Vite, Tailwind CSS, shadcn/ui |
 | Backend | Django 4, Django REST Framework |
 | Database | PostgreSQL (Render) / SQLite (local dev) |
@@ -65,7 +65,7 @@ python manage.py runserver
 Required environment variables (set in `.env` or Render dashboard):
 
 | Variable | Purpose |
-|---|---|
+| --- | --- |
 | `SECRET_KEY` | Django secret key |
 | `DATABASE_URL` | PostgreSQL connection string |
 | `OPENAI_API_KEY` | AI keyword generation, CV extraction, semantic search |
@@ -88,7 +88,7 @@ Required environment variables (set in `.env` or Render dashboard):
 ## Key Documentation
 
 | File | What it covers |
-|---|---|
+| --- | --- |
 | `docs/documentation-index.md` | Entry point for the current frontend documentation set |
 | `docs/frontend-overview.md` | Every public page, faculty dashboard tab, and admin dashboard tab — what each does and how it works |
 | `docs/current-implementation-playbook.md` | Current product architecture, data flow, and live implementation details |
@@ -129,11 +129,16 @@ The frontend now loads a public dataset from the backend and renders it through 
 - expertise-map bubble exploration
 - public faculty profile pages
 - admin approval queue patterns mirroring the current backend review logic
+- a shared SU-themed discovery header with desktop navigation and a hamburger menu on narrow screens
 
 ### Current data trust model
 
 The frontend is designed to sit on top of a backend that enforces approved-only public visibility and keeps ambiguous or unverified content in private review queues. That means the user-facing product is intentionally safer than a raw metadata dump and is designed to be presentation-ready, not just data-rich.
 
+### Current navigation model
+
+The live public header uses the Salisbury University wordmark, a burgundy discovery navigation bar, and a narrow white/gold/burgundy transition between the logo and nav areas. The desktop header exposes the discovery destinations directly, while mobile and narrow layouts use a hamburger menu so the navigation does not overflow.
+
 ---
 
-*SCOUP v2.0 · Salisbury University · Spring 2026*
+SCOUP v2.0 · Salisbury University · Spring 2026

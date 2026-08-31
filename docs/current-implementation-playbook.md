@@ -167,3 +167,20 @@ This frontend is intentionally built around live backend data and should remain 
 - search/data drift caused by returning too much noisy metadata to a user-facing dataset
 
 The current build is best treated as a presentation-grade public discovery surface built on a carefully curated trust boundary.
+
+---
+
+## 11. Current header and navigation model
+
+The public site now uses a shared discovery header rather than separate homepage-only navigation.
+
+Current behavior:
+
+- The Salisbury University wordmark anchors the left side of the header and links to the official SU website.
+- The discovery navigation is a horizontal burgundy bar with SU gold active styling.
+- The Search item routes to `/`, so the home page remains the main large-search entry point.
+- Desktop navigation keeps icons and full labels for the discovery destinations.
+- Narrow/mobile layouts use a hamburger menu that exposes all discovery destinations and the faculty sign-in action.
+- The header is fixed above page content so chart labels and scrollable content cannot bleed through it.
+
+The seagull-divider experiment was removed from the active header in favor of a simpler gradient transition between the logo block and the burgundy navigation bar. The isolated seagull image is retained as an asset for future design exploration, but the stable shipped version avoids using it as layout-critical chrome.
