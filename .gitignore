@@ -8,6 +8,7 @@ generated/
 !.env.example
 .DS_Store
 *.log
+*.bak
 database_backups/*.sqlite3
 database_backups/*.json
 .claude/
@@ -17,6 +18,9 @@ docs/SCOUP-Presentation-Prep.docx
 docs/make-presentation-prep.js
 docs/node_modules/
 docs/package*.json
+
+# Local deployment and rollback history
+/OPERATIONS_LOG.md
 
 #Scripts
 *.sh
