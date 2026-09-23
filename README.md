@@ -1,3 +1,5 @@
+<img width="1000" height="320" alt="Salisbury_University_logo-BEC35tV6" src="https://github.com/user-attachments/assets/fcf109fd-c265-41c4-8221-eb411925b48c" />
+
 # SCOUP — Faculty Research Discovery Platform
 
 Salisbury University · v2.0
